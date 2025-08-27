@@ -37,6 +37,11 @@ class NoteItem extends StatelessWidget {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
+            const SizedBox(height: 8),
+            Text(
+              "${note.date.day}/${note.date.month}/${note.date.year}",
+              style: const TextStyle(fontSize: 12, color: Colors.grey),
+            ),
           ],
         ),
       ),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:note_clone/Pages/home_page.dart';
+import 'pages/home_page.dart';
 
 void main() {
   runApp(const MyApp());
