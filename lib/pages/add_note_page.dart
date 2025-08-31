@@ -6,32 +6,30 @@ class AddNotePage extends StatefulWidget {
   const AddNotePage({super.key, this.note});
 
   @override
-  State<AddNotePage> createState() => _AddNotePageState();
+  State<AddNotePage> createState() => AddNotePageState();
 }
 
-class _AddNotePageState extends State<AddNotePage> {
-  late final TextEditingController _titleController;
-  late final TextEditingController _contentController;
+class AddNotePageState extends State<AddNotePage> {
+  late final TextEditingController titleController;
+  late final TextEditingController contentController;
 
   @override
   void initState() {
     super.initState();
-    _titleController = TextEditingController(text: widget.note?.title ?? '');
-    _contentController = TextEditingController(
-      text: widget.note?.content ?? '',
-    );
+    titleController = TextEditingController(text: widget.note?.title ?? '');
+    contentController = TextEditingController(text: widget.note?.content ?? '');
   }
 
   @override
   void dispose() {
-    _titleController.dispose();
-    _contentController.dispose();
+    titleController.dispose();
+    contentController.dispose();
     super.dispose();
   }
 
   void saveNote() {
-    final title = _titleController.text.trim();
-    final content = _contentController.text.trim();
+    final title = titleController.text.trim();
+    final content = contentController.text.trim();
 
     if (title.isEmpty && content.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -51,14 +49,13 @@ class _AddNotePageState extends State<AddNotePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.note == null ? "Thêm Ghi Chú" : "Sửa Ghi Chú"),
-        backgroundColor: const Color(0xFF1E1E1E),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
-              controller: _titleController,
+              controller: titleController,
               decoration: const InputDecoration(
                 labelText: "Tiêu đề",
                 border: OutlineInputBorder(),
@@ -66,7 +63,7 @@ class _AddNotePageState extends State<AddNotePage> {
             ),
             const SizedBox(height: 12),
             TextField(
-              controller: _contentController,
+              controller: contentController,
               decoration: const InputDecoration(
                 labelText: "Nội dung",
                 border: OutlineInputBorder(),
@@ -78,7 +75,6 @@ class _AddNotePageState extends State<AddNotePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: saveNote,
-        backgroundColor: const Color(0xFF2E2E2E),
         child: const Icon(Icons.save, size: 28),
       ),
     );
