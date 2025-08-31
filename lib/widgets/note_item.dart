@@ -9,6 +9,7 @@ class NoteItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -16,7 +17,7 @@ class NoteItem extends StatelessWidget {
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF1E1E1E),
+          color: Theme.of(context).cardColor,
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
@@ -24,23 +25,25 @@ class NoteItem extends StatelessWidget {
           children: [
             Text(
               note.title,
-              style: const TextStyle(
+              style: theme.textTheme.bodyLarge?.copyWith(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 6),
             Text(
               note.content,
-              style: const TextStyle(fontSize: 14, color: Colors.white70),
+              style: TextStyle(color: theme.colorScheme.onSurface),
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 8),
             Text(
               "${note.date.day}/${note.date.month}/${note.date.year}",
-              style: const TextStyle(fontSize: 12, color: Colors.grey),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurface.withOpacity(0.6),
+              ),
             ),
           ],
         ),

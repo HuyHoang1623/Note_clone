@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:note_clone/pages/to_do_list_page.dart';
 import 'add_note_page.dart';
 import '../models/note.dart';
 import '../widgets/note_item.dart';
@@ -190,6 +191,29 @@ class HomePageState extends State<HomePage> {
       floatingActionButton: FloatingActionButton(
         onPressed: addNote,
         child: const Icon(Icons.add, size: 28),
+      ),
+
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 6.0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.home, size: 28),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.checklist, size: 28),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ToDoListPage()),
+                );
+              },
+            ),
+          ],
+        ),
       ),
     );
   }

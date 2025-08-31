@@ -16,6 +16,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
+        cardColor: Color.fromARGB(255, 200, 200, 200),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
@@ -29,8 +30,9 @@ class MyApp extends StatelessWidget {
       darkTheme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xFF0B0B0B),
+        cardColor: const Color.fromARGB(255, 64, 64, 64),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF1E1E1E),
+          backgroundColor: Colors.black,
           foregroundColor: Colors.white,
         ),
         inputDecorationTheme: const InputDecorationTheme(
@@ -38,6 +40,8 @@ class MyApp extends StatelessWidget {
         ),
         textTheme: const TextTheme(bodyLarge: TextStyle(color: Colors.white)),
       ),
+
+      themeMode: ThemeMode.dark,
 
       home: const HomePage(),
     );
