@@ -5,8 +5,24 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
+
+  static _MyAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>();
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  ThemeMode _themeMode = ThemeMode.dark;
+
+  void changeTheme(ThemeMode mode) {
+    setState(() {
+      _themeMode = mode;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,7 +32,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.light,
         scaffoldBackgroundColor: Colors.white,
-        cardColor: Color.fromARGB(255, 200, 200, 200),
+        cardColor: const Color.fromARGB(255, 200, 200, 200),
         appBarTheme: const AppBarTheme(
           backgroundColor: Colors.white,
           foregroundColor: Colors.black,
@@ -41,8 +57,7 @@ class MyApp extends StatelessWidget {
         textTheme: const TextTheme(bodyLarge: TextStyle(color: Colors.white)),
       ),
 
-      themeMode: ThemeMode.dark,
-
+      themeMode: _themeMode,
       home: const HomePage(),
     );
   }

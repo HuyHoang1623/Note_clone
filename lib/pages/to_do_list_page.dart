@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
+import '../models/task.dart';
+import '../main.dart';
 
 class ToDoListPage extends StatefulWidget {
   const ToDoListPage({super.key});
@@ -9,39 +11,30 @@ class ToDoListPage extends StatefulWidget {
 }
 
 class _ToDoListPageState extends State<ToDoListPage> {
-  final List<String> ongoingTasks = [];
-  final List<String> completedTasks = [];
+  final List<Task> tasks = [];
   final TextEditingController taskController = TextEditingController();
 
   void addTask() {
-    final task = taskController.text.trim();
-    if (task.isNotEmpty) {
+    final taskTitle = taskController.text.trim();
+    if (taskTitle.isNotEmpty) {
       setState(() {
-        ongoingTasks.add(task);
+        tasks.add(Task(title: taskTitle, createdAt: DateTime.now()));
         taskController.clear();
       });
     }
   }
 
-  void deleteTask(String task, bool isCompleted) {
+  void deleteTask(String id) {
     setState(() {
-      if (isCompleted) {
-        completedTasks.remove(task);
-      } else {
-        ongoingTasks.remove(task);
-      }
+      tasks.removeWhere((task) => task.id == id);
     });
   }
 
-  void toggleTask(String task, bool isCompleted) {
+  void toggleTask(Task task) {
     setState(() {
-      if (isCompleted) {
-        completedTasks.remove(task);
-        ongoingTasks.add(task);
-      } else {
-        ongoingTasks.remove(task);
-        completedTasks.add(task);
-      }
+      task.status = task.status == TaskStatus.ongoing
+          ? TaskStatus.completed
+          : TaskStatus.ongoing;
     });
   }
 
@@ -55,12 +48,33 @@ class _ToDoListPageState extends State<ToDoListPage> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
+    final ongoingTasks = tasks
+        .where((task) => task.status == TaskStatus.ongoing)
+        .toList();
+    final completedTasks = tasks
+        .where((task) => task.status == TaskStatus.completed)
+        .toList();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Việc cần làm"),
         backgroundColor: theme.appBarTheme.backgroundColor,
         actions: [
-          IconButton(icon: const Icon(Icons.settings), onPressed: () {}),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.settings),
+            onSelected: (value) {
+              if (value == "light") {
+                MyApp.of(context)?.changeTheme(ThemeMode.light);
+              } else if (value == "dark") {
+                MyApp.of(context)?.changeTheme(ThemeMode.dark);
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: "light", child: Text("Light Theme")),
+              const PopupMenuItem(value: "dark", child: Text("Dark Theme")),
+              const PopupMenuItem(value: "system", child: Text("System Theme")),
+            ],
+          ),
         ],
       ),
       body: Padding(
@@ -83,7 +97,6 @@ class _ToDoListPageState extends State<ToDoListPage> {
               ],
             ),
             const SizedBox(height: 16),
-
             Expanded(
               child: ListView(
                 children: [
@@ -92,26 +105,25 @@ class _ToDoListPageState extends State<ToDoListPage> {
                     (task) => ListTile(
                       leading: Checkbox(
                         value: false,
-                        onChanged: (_) => toggleTask(task, false),
+                        onChanged: (_) => toggleTask(task),
                       ),
-                      title: Text(task),
+                      title: Text(task.title),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => deleteTask(task, false),
+                        onPressed: () => deleteTask(task.id),
                       ),
                     ),
                   ),
                   const SizedBox(height: 16),
-
                   Text("Đã hoàn thành", style: theme.textTheme.titleLarge),
                   ...completedTasks.map(
                     (task) => ListTile(
                       leading: Checkbox(
                         value: true,
-                        onChanged: (_) => toggleTask(task, true),
+                        onChanged: (_) => toggleTask(task),
                       ),
                       title: Text(
-                        task,
+                        task.title,
                         style: const TextStyle(
                           decoration: TextDecoration.lineThrough,
                           color: Colors.grey,
@@ -119,7 +131,7 @@ class _ToDoListPageState extends State<ToDoListPage> {
                       ),
                       trailing: IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
-                        onPressed: () => deleteTask(task, true),
+                        onPressed: () => deleteTask(task.id),
                       ),
                     ),
                   ),
@@ -129,7 +141,6 @@ class _ToDoListPageState extends State<ToDoListPage> {
           ],
         ),
       ),
-
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 6.0,

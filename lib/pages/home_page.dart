@@ -3,6 +3,7 @@ import 'package:note_clone/pages/to_do_list_page.dart';
 import 'add_note_page.dart';
 import '../models/note.dart';
 import '../widgets/note_item.dart';
+import '../main.dart'; // để gọi MyApp.of(context)?.changeTheme
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -37,7 +38,7 @@ class HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     filteredNotes = notes;
-    searchController.addListener(_searchNotes);
+    searchController.addListener(searchNotes);
   }
 
   @override
@@ -46,7 +47,7 @@ class HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  void _searchNotes() {
+  void searchNotes() {
     final query = searchController.text.toLowerCase();
     setState(() {
       filteredNotes = notes.where((note) {
@@ -64,36 +65,34 @@ class HomePageState extends State<HomePage> {
     if (newNote != null) {
       setState(() {
         notes.add(newNote);
-        _searchNotes();
+        searchNotes();
       });
     }
   }
 
-  void editNote(int index) async {
+  void editNote(String id) async {
+    final noteToEdit = notes.firstWhere((note) => note.id == id);
     final updatedNote = await Navigator.push<Note>(
       context,
-      MaterialPageRoute(
-        builder: (context) => AddNotePage(note: filteredNotes[index]),
-      ),
+      MaterialPageRoute(builder: (context) => AddNotePage(note: noteToEdit)),
     );
     if (updatedNote != null) {
-      final noteIndex = notes.indexOf(filteredNotes[index]);
+      final noteIndex = notes.indexWhere((note) => note.id == id);
       setState(() {
         notes[noteIndex] = updatedNote;
-        _searchNotes();
+        searchNotes();
       });
     }
   }
 
-  void deleteNote(int index) {
-    final noteIndex = notes.indexOf(filteredNotes[index]);
+  void deleteNote(String id) {
     setState(() {
-      notes.removeAt(noteIndex);
-      _searchNotes();
+      notes.removeWhere((note) => note.id == id);
+      searchNotes();
     });
   }
 
-  void showNoteMenu(int index) {
+  void showNoteMenu(String id) {
     final theme = Theme.of(context);
     showModalBottomSheet(
       context: context,
@@ -112,7 +111,7 @@ class HomePageState extends State<HomePage> {
               ),
               onTap: () {
                 Navigator.pop(context);
-                editNote(index);
+                editNote(id);
               },
             ),
             ListTile(
@@ -123,7 +122,7 @@ class HomePageState extends State<HomePage> {
               ),
               onTap: () {
                 Navigator.pop(context);
-                deleteNote(index);
+                deleteNote(id);
               },
             ),
           ],
@@ -141,7 +140,20 @@ class HomePageState extends State<HomePage> {
         title: const Text("Ghi chú của tôi"),
         backgroundColor: theme.appBarTheme.backgroundColor,
         actions: [
-          IconButton(icon: const Icon(Icons.settings), onPressed: () {}),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.settings),
+            onSelected: (value) {
+              if (value == "light") {
+                MyApp.of(context)?.changeTheme(ThemeMode.light);
+              } else if (value == "dark") {
+                MyApp.of(context)?.changeTheme(ThemeMode.dark);
+              }
+            },
+            itemBuilder: (context) => [
+              const PopupMenuItem(value: "light", child: Text("Light Theme")),
+              const PopupMenuItem(value: "dark", child: Text("Dark Theme")),
+            ],
+          ),
         ],
       ),
       body: Column(
@@ -181,7 +193,7 @@ class HomePageState extends State<HomePage> {
                       final note = filteredNotes[index];
                       return NoteItem(
                         note: note,
-                        onTap: () => showNoteMenu(index),
+                        onTap: () => showNoteMenu(note.id),
                       );
                     },
                   ),
@@ -192,7 +204,6 @@ class HomePageState extends State<HomePage> {
         onPressed: addNote,
         child: const Icon(Icons.add, size: 28),
       ),
-
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 6.0,
