@@ -28,14 +28,6 @@ void showThemePopupMenu(BuildContext context, Offset position) {
           });
         },
       ),
-      PopupMenuItem(
-        child: const Text("System"),
-        onTap: () {
-          Future.delayed(Duration.zero, () {
-            MyApp.of(context)?.changeTheme(ThemeMode.system);
-          });
-        },
-      ),
     ],
   );
 }
