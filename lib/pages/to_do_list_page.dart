@@ -72,7 +72,6 @@ class _ToDoListPageState extends State<ToDoListPage> {
             itemBuilder: (context) => [
               const PopupMenuItem(value: "light", child: Text("Light Theme")),
               const PopupMenuItem(value: "dark", child: Text("Dark Theme")),
-              const PopupMenuItem(value: "system", child: Text("System Theme")),
             ],
           ),
         ],

@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-import 'pages/home_page.dart';
+import 'package:note_clone/pages/add_note_page.dart';
+import 'package:note_clone/pages/home_page.dart';
+import 'package:note_clone/pages/signup_page.dart';
+import 'package:note_clone/pages/to_do_list_page.dart';
+import 'pages/signin_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -58,7 +62,16 @@ class _MyAppState extends State<MyApp> {
       ),
 
       themeMode: _themeMode,
-      home: const HomePage(),
+
+      initialRoute: 'signin',
+
+      routes: {
+        'signin': (context) => const SignInPage(),
+        'signup': (context) => const SignUpPage(),
+        'homepage': (context) => const HomePage(),
+        'todolist': (context) => const ToDoListPage(),
+        'addnote': (context) => const AddNotePage(),
+      },
     );
   }
 }
