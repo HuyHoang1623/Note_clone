@@ -18,16 +18,22 @@ class HomePageState extends State<HomePage> {
       title: "Ghi chú 1",
       content: "Nội dung ghi chú 1",
       date: DateTime.now(),
+      bgColor: Color(0xFFF98866),
+      textColor: Color(0xFFFFF2D7),
     ),
     Note(
       title: "Ghi chú 2",
       content: "Nội dung ghi chú 2",
       date: DateTime(2025, 5, 20),
+      bgColor: Color(0xFF2C5F2D),
+      textColor: Color(0xFFFFDD4A),
     ),
     Note(
       title: "Ghi chú 3",
       content: "Nội dung ghi chú 3",
       date: DateTime(2024, 12, 15),
+      bgColor: Color(0xFF00539C),
+      textColor: Color(0xFFFFB58F),
     ),
   ];
 
