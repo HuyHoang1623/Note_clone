@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:note_clone/pages/add_note_page.dart';
-import 'package:note_clone/pages/home_page.dart';
-import 'package:note_clone/pages/signup_page.dart';
-import 'package:note_clone/pages/to_do_list_page.dart';
-import 'pages/signin_page.dart';
+import 'package:note_clone/original/pages/add_note_page.dart';
+import 'package:note_clone/original/pages/home_page.dart';
+import 'package:note_clone/core/signin_signup/signup_page.dart';
+import 'package:note_clone/original/pages/to_do_list_page.dart';
+import 'core/signin_signup/signin_page.dart';
 
 void main() {
   runApp(const MyApp());

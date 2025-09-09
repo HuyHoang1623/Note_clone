@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../models/note.dart';
+import '../../core/models/note.dart';
 
 class AddNotePage extends StatefulWidget {
   final Note? note;

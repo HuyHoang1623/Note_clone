@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:note_clone/pages/to_do_list_page.dart';
+import 'package:note_clone/original/pages/to_do_list_page.dart';
 import 'add_note_page.dart';
-import '../models/note.dart';
+import '../../core/models/note.dart';
 import '../widgets/note_item.dart';
-import '../main.dart';
+import 'package:note_clone/main.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});

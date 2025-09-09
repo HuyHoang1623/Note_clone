@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'home_page.dart';
-import '../models/task.dart';
-import '../main.dart';
+import 'package:note_clone/core/models/task.dart';
+import 'package:note_clone/main.dart';
 
 class ToDoListPage extends StatefulWidget {
   const ToDoListPage({super.key});
