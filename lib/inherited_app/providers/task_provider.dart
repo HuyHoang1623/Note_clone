@@ -1,28 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:note_clone/core/models/task.dart';
 
-class TaskProvider extends ChangeNotifier {
+class TaskProvider extends InheritedWidget {
+  final TaskProviderState data;
+
+  const TaskProvider({super.key, required this.data, required Widget child})
+    : super(child: child);
+
+  static TaskProviderState of(BuildContext context) {
+    return context.dependOnInheritedWidgetOfExactType<TaskProvider>()!.data;
+  }
+
+  @override
+  bool updateShouldNotify(TaskProvider oldWidget) => true;
+}
+
+class TaskProviderState extends State<StatefulWidget> {
   final List<Task> _tasks = [];
 
-  List<Task> get ongoing =>
-      _tasks.where((t) => t.status == TaskStatus.ongoing).toList();
-  List<Task> get completed =>
-      _tasks.where((t) => t.status == TaskStatus.completed).toList();
+  List<Task> get tasks => _tasks;
 
-  void add(Task task) {
-    _tasks.add(task);
-    notifyListeners();
+  void addTask(Task task) {
+    setState(() {
+      _tasks.add(task);
+    });
   }
 
-  void toggle(Task task) {
-    task.status = task.status == TaskStatus.ongoing
-        ? TaskStatus.completed
-        : TaskStatus.ongoing;
-    notifyListeners();
+  void deleteTask(String id) {
+    setState(() {
+      _tasks.removeWhere((t) => t.id == id);
+    });
   }
 
-  void delete(String id) {
-    _tasks.removeWhere((t) => t.id == id);
-    notifyListeners();
+  void toggleTask(Task task) {
+    setState(() {
+      task.status = task.status == TaskStatus.ongoing
+          ? TaskStatus.completed
+          : TaskStatus.ongoing;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return TaskProvider(data: this, child: Container());
   }
 }
