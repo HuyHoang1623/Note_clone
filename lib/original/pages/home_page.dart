@@ -136,7 +136,6 @@ class HomePageState extends State<HomePage> {
     );
   }
 
-  /// Widget con thay cho class NoteItem
   Widget buildNoteItem(Note note) {
     return Card(
       color: note.backgroundColor,
