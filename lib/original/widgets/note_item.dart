@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../core/models/note.dart';
 
 class NoteItem extends StatelessWidget {
-  final Note note;
   final VoidCallback onTap;
 
   const NoteItem({super.key, required this.note, required this.onTap});

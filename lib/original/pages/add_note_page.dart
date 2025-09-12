@@ -33,6 +33,7 @@ class AddNotePageState extends State<AddNotePage> {
     contentController = TextEditingController(text: widget.note?.content ?? '');
 
     selectedBgColor = widget.note?.bgColor ?? Colors.white;
+    selectedBgColor = widget.note?.backgroundColor ?? Colors.white;
     selectedTextColor = widget.note?.textColor ?? Colors.black87;
   }
 
@@ -62,6 +63,7 @@ class AddNotePageState extends State<AddNotePage> {
         content: content,
         date: DateTime.now(),
         bgColor: selectedBgColor,
+        backgroundColor: selectedBgColor,
         textColor: selectedTextColor,
       ),
     );

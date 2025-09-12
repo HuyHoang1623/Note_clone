@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:note_clone/original/pages/to_do_list_page.dart';
 import 'add_note_page.dart';
 import '../../core/models/note.dart';
-import '../widgets/note_item.dart';
 import 'package:note_clone/main.dart';
 
 class HomePage extends StatefulWidget {
@@ -15,25 +14,25 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   final List<Note> notes = [
     Note(
-      title: "Ghi chú 1",
+      title: "Ghi chú 99",
       content: "Nội dung ghi chú 1",
       date: DateTime.now(),
-      bgColor: Color(0xFFF98866),
-      textColor: Color(0xFFFFF2D7),
+      backgroundColor: const Color(0xFFF98866),
+      textColor: const Color(0xFFFFF2D7),
     ),
     Note(
       title: "Ghi chú 2",
       content: "Nội dung ghi chú 2",
       date: DateTime(2025, 5, 20),
-      bgColor: Color(0xFF2C5F2D),
-      textColor: Color(0xFFFFDD4A),
+      backgroundColor: const Color(0xFF2C5F2D),
+      textColor: const Color(0xFFFFDD4A),
     ),
     Note(
       title: "Ghi chú 3",
       content: "Nội dung ghi chú 3",
       date: DateTime(2024, 12, 15),
-      bgColor: Color(0xFF00539C),
-      textColor: Color(0xFFFFB58F),
+      backgroundColor: const Color(0xFF00539C),
+      textColor: const Color(0xFFFFB58F),
     ),
   ];
 
@@ -66,7 +65,7 @@ class HomePageState extends State<HomePage> {
   void addNote() async {
     final newNote = await Navigator.push<Note>(
       context,
-      MaterialPageRoute(builder: (context) => const AddNotePage()),
+      MaterialPageRoute(builder: (context) => AddNotePage()),
     );
     if (newNote != null) {
       setState(() {
@@ -137,6 +136,53 @@ class HomePageState extends State<HomePage> {
     );
   }
 
+  /// Widget con thay cho class NoteItem
+  Widget buildNoteItem(Note note) {
+    return Card(
+      color: note.backgroundColor,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => showNoteMenu(note.id),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                note.title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: note.textColor,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                note.content,
+                style: TextStyle(color: note.textColor),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Text(
+                  "${note.date.day}/${note.date.month}/${note.date.year}",
+                  style: TextStyle(
+                    color: note.textColor.withOpacity(0.7),
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -197,10 +243,7 @@ class HomePageState extends State<HomePage> {
                     itemCount: filteredNotes.length,
                     itemBuilder: (context, index) {
                       final note = filteredNotes[index];
-                      return NoteItem(
-                        note: note,
-                        onTap: () => showNoteMenu(note.id),
-                      );
+                      return buildNoteItem(note);
                     },
                   ),
           ),

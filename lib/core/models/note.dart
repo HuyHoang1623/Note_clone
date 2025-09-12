@@ -5,7 +5,7 @@ class Note {
   String title;
   String content;
   DateTime date;
-  Color bgColor;
+  Color backgroundColor;
   Color textColor;
 
   Note({
@@ -13,7 +13,7 @@ class Note {
     required this.title,
     required this.content,
     required this.date,
-    required this.bgColor,
+    required this.backgroundColor,
     required this.textColor,
   }) : id = id ?? DateTime.now().microsecondsSinceEpoch.toString();
 }
