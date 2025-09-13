@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../core/models/note.dart';
+import 'package:note_clone/core/color_pair.dart';
 
 class AddNotePage extends StatefulWidget {
   final Note? note;
-  const AddNotePage({super.key, this.note});
+  final List<Map<String, Color>> noteColors = ColorPair().colorpairs;
+  AddNotePage({super.key, this.note});
 
   @override
   State<AddNotePage> createState() => AddNotePageState();
@@ -13,18 +15,8 @@ class AddNotePageState extends State<AddNotePage> {
   late final TextEditingController titleController;
   late final TextEditingController contentController;
 
-  late Color selectedBgColor;
+  late Color selectedBackgroundColor;
   late Color selectedTextColor;
-
-  final List<Map<String, Color>> noteColors = [
-    {"bg": const Color(0xFFF98866), "text": const Color(0xFFFFF2D7)},
-    {"bg": const Color(0xFF203FFF), "text": const Color(0xFFADEFD1)},
-    {"bg": const Color(0xFFF95700), "text": const Color(0xFFFFFFFF)},
-    {"bg": const Color(0xFF6F56A6), "text": const Color(0xFFF1E5FF)},
-    {"bg": const Color(0xFF2C5F2D), "text": const Color(0xFFFFDD4A)},
-    {"bg": const Color(0xFF0D706E), "text": const Color(0xFFCEEFFA)},
-    {"bg": const Color(0xFF00539C), "text": const Color(0xFFFFB58F)},
-  ];
 
   @override
   void initState() {
@@ -32,8 +24,7 @@ class AddNotePageState extends State<AddNotePage> {
     titleController = TextEditingController(text: widget.note?.title ?? '');
     contentController = TextEditingController(text: widget.note?.content ?? '');
 
-    selectedBgColor = widget.note?.bgColor ?? Colors.white;
-    selectedBgColor = widget.note?.backgroundColor ?? Colors.white;
+    selectedBackgroundColor = widget.note?.backgroundColor ?? Colors.white;
     selectedTextColor = widget.note?.textColor ?? Colors.black87;
   }
 
@@ -62,8 +53,7 @@ class AddNotePageState extends State<AddNotePage> {
         title: title,
         content: content,
         date: DateTime.now(),
-        bgColor: selectedBgColor,
-        backgroundColor: selectedBgColor,
+        backgroundColor: selectedBackgroundColor,
         textColor: selectedTextColor,
       ),
     );
@@ -74,7 +64,7 @@ class AddNotePageState extends State<AddNotePage> {
       labelText: label,
       labelStyle: TextStyle(color: selectedTextColor),
       filled: true,
-      fillColor: selectedBgColor, // 🔹 nền bên trong TextField
+      fillColor: selectedBackgroundColor,
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide(color: selectedTextColor.withOpacity(0.7)),
       ),
@@ -109,21 +99,22 @@ class AddNotePageState extends State<AddNotePage> {
             const SizedBox(height: 16),
             Wrap(
               spacing: 8,
-              children: noteColors.map((pair) {
-                final bg = pair["bg"]!;
+              children: widget.noteColors.map((pair) {
+                final background = pair["background"]!;
                 final txt = pair["text"]!;
                 final isSelected =
-                    (bg == selectedBgColor && txt == selectedTextColor);
+                    (background == selectedBackgroundColor &&
+                    txt == selectedTextColor);
 
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      selectedBgColor = bg;
+                      selectedBackgroundColor = background;
                       selectedTextColor = txt;
                     });
                   },
                   child: CircleAvatar(
-                    backgroundColor: bg,
+                    backgroundColor: background,
                     radius: 20,
                     child: isSelected ? Icon(Icons.check, color: txt) : null,
                   ),
@@ -134,7 +125,7 @@ class AddNotePageState extends State<AddNotePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: selectedBgColor,
+        backgroundColor: selectedBackgroundColor,
         foregroundColor: selectedTextColor,
         onPressed: saveNote,
         child: const Icon(Icons.save, size: 28),
