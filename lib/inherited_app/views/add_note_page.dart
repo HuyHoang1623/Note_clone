@@ -17,7 +17,7 @@ class AddNotePageState extends State<AddNotePage> {
   late final TextEditingController titleController;
   late final TextEditingController contentController;
 
-  late Color selectedBgColor;
+  late Color selectedBackgroundColor;
   late Color selectedTextColor;
 
   @override
@@ -26,7 +26,7 @@ class AddNotePageState extends State<AddNotePage> {
     titleController = TextEditingController(text: widget.note?.title ?? '');
     contentController = TextEditingController(text: widget.note?.content ?? '');
 
-    selectedBgColor = widget.note?.backgroundColor ?? Colors.white;
+    selectedBackgroundColor = widget.note?.backgroundColor ?? Colors.white;
     selectedTextColor = widget.note?.textColor ?? Colors.black87;
   }
 
@@ -55,17 +55,17 @@ class AddNotePageState extends State<AddNotePage> {
       title: title,
       content: content,
       date: DateTime.now(),
-      backgroundColor: selectedBgColor,
+      backgroundColor: selectedBackgroundColor,
       textColor: selectedTextColor,
     );
 
     if (widget.note == null) {
-      noteProvider.addNote(newNote); // thêm mới
+      noteProvider.addNote(newNote);
+      Navigator.pop(context);
     } else {
-      noteProvider.editNote(newNote); // sửa
+      noteProvider.editNote(newNote);
+      Navigator.pop(context);
     }
-
-    Navigator.pop(context); // chỉ cần quay lại, không cần trả data
   }
 
   InputDecoration fieldDecoration(String label) {
@@ -73,7 +73,7 @@ class AddNotePageState extends State<AddNotePage> {
       labelText: label,
       labelStyle: TextStyle(color: selectedTextColor),
       filled: true,
-      fillColor: selectedBgColor,
+      fillColor: selectedBackgroundColor,
       enabledBorder: OutlineInputBorder(
         borderSide: BorderSide(color: selectedTextColor.withOpacity(0.7)),
       ),
@@ -109,20 +109,21 @@ class AddNotePageState extends State<AddNotePage> {
             Wrap(
               spacing: 8,
               children: widget.noteColors.map((pair) {
-                final bg = pair["bg"]!;
+                final background = pair["background"]!;
                 final txt = pair["text"]!;
                 final isSelected =
-                    (bg == selectedBgColor && txt == selectedTextColor);
+                    (background == selectedBackgroundColor &&
+                    txt == selectedTextColor);
 
                 return GestureDetector(
                   onTap: () {
                     setState(() {
-                      selectedBgColor = bg;
+                      selectedBackgroundColor = background;
                       selectedTextColor = txt;
                     });
                   },
                   child: CircleAvatar(
-                    backgroundColor: bg,
+                    backgroundColor: background,
                     radius: 20,
                     child: isSelected ? Icon(Icons.check, color: txt) : null,
                   ),
@@ -133,7 +134,7 @@ class AddNotePageState extends State<AddNotePage> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: selectedBgColor,
+        backgroundColor: selectedBackgroundColor,
         foregroundColor: selectedTextColor,
         onPressed: saveNote,
         child: const Icon(Icons.save, size: 28),
