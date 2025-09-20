@@ -31,3 +31,12 @@ class _AddNotePageState extends State<AddNotePage> {
       _initVideoController(path);
     }
   }
+  @override
+  void dispose() {
+    titleController.dispose();
+    contentController.dispose();
+    for (var controller in _videoControllers.values) {
+      controller.dispose();
+    }
+    super.dispose();
+  }
