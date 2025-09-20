@@ -18,3 +18,8 @@ class _AddNotePageState extends State<AddNotePage> {
   List<String> _images = [];
   List<String> _videos = [];
   final Map<String, VideoPlayerController> _videoControllers = {};
+    titleController = TextEditingController(text: widget.note?.title ?? '');
+    contentController = TextEditingController(text: widget.note?.content ?? '');
+
+    selectedBackgroundColor = widget.note?.backgroundColor ?? Colors.white;
+    selectedTextColor = widget.note?.textColor ?? Colors.black87;
