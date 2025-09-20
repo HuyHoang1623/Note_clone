@@ -1,3 +1,14 @@
+import 'dart:io';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:note_clone/BLoC_app/BLoC/note/note_bloc.dart';
+import 'package:note_clone/BLoC_app/BLoC/note/note_even.dart';
+import 'package:note_clone/BLoC_app/BLoC/note/note_state.dart';
+import 'package:note_clone/core/color_pair.dart';
+import 'package:note_clone/core/models/note.dart';
+import 'package:video_player/video_player.dart';
+
 class AddNotePage extends StatefulWidget {
   final Note? note;
   final List<Map<String, Color>> noteColors = ColorPair().colorpairs;
@@ -11,13 +22,19 @@ class AddNotePage extends StatefulWidget {
 class _AddNotePageState extends State<AddNotePage> {
   late final TextEditingController titleController;
   late final TextEditingController contentController;
+
   late Color selectedBackgroundColor;
   late Color selectedTextColor;
+
   final _picker = ImagePicker();
 
   List<String> _images = [];
   List<String> _videos = [];
   final Map<String, VideoPlayerController> _videoControllers = {};
+
+  @override
+  void initState() {
+    super.initState();
     titleController = TextEditingController(text: widget.note?.title ?? '');
     contentController = TextEditingController(text: widget.note?.content ?? '');
 
@@ -31,6 +48,7 @@ class _AddNotePageState extends State<AddNotePage> {
       _initVideoController(path);
     }
   }
+
   @override
   void dispose() {
     titleController.dispose();
@@ -40,6 +58,7 @@ class _AddNotePageState extends State<AddNotePage> {
     }
     super.dispose();
   }
+
   Future<void> _pickImage({bool fromCamera = false}) async {
     final picked = await _picker.pickImage(
       source: fromCamera ? ImageSource.camera : ImageSource.gallery,
@@ -68,6 +87,7 @@ class _AddNotePageState extends State<AddNotePage> {
       });
     _videoControllers[path] = controller;
   }
+
   void _showFullVideo(VideoPlayerController controller) {
     showDialog(
       context: context,
