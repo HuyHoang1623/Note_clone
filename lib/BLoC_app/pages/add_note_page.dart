@@ -178,3 +178,204 @@ class _AddNotePageState extends State<AddNotePage> {
           appBar: AppBar(
             title: Text(widget.note == null ? "Thêm Ghi Chú" : "Sửa Ghi Chú"),
           ),
+          body: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView(
+              children: [
+                TextField(
+                  controller: titleController,
+                  style: TextStyle(color: selectedTextColor),
+                  decoration: fieldDecoration("Tiêu đề"),
+                ),
+                const SizedBox(height: 12),
+                TextField(
+                  controller: contentController,
+                  style: TextStyle(color: selectedTextColor),
+                  decoration: fieldDecoration("Nội dung"),
+                  maxLines: 5,
+                ),
+                const SizedBox(height: 16),
+                Wrap(
+                  spacing: 8,
+                  children: widget.noteColors.map((pair) {
+                    final background = pair["background"]!;
+                    final txt = pair["text"]!;
+                    final isSelected =
+                        (background == selectedBackgroundColor &&
+                        txt == selectedTextColor);
+
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          selectedBackgroundColor = background;
+                          selectedTextColor = txt;
+                        });
+                      },
+                      child: CircleAvatar(
+                        backgroundColor: background,
+                        radius: 20,
+                        child: isSelected
+                            ? Icon(Icons.check, color: txt)
+                            : null,
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 20),
+                if (_images.isNotEmpty) ...[
+                  const Text(
+                    "Ảnh:",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _images.map((path) {
+                        return GestureDetector(
+                          onTap: () {
+                            showDialog(
+                              context: context,
+                              builder: (_) =>
+                                  Dialog(child: Image.file(File(path))),
+                            );
+                          },
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: Image.file(
+                                  File(path),
+                                  width: 100,
+                                  height: 100,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      _images.remove(path);
+                                    });
+                                  },
+                                  child: const CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: Colors.red,
+                                    child: Icon(
+                                      Icons.close,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                if (_videos.isNotEmpty) ...[
+                  const Text(
+                    "Video:",
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: _videos.map((path) {
+                        final controller = _videoControllers[path];
+                        if (controller == null ||
+                            !controller.value.isInitialized) {
+                          return const Padding(
+                            padding: EdgeInsets.all(4),
+                            child: Icon(
+                              Icons.videocam,
+                              size: 48,
+                              color: Colors.blue,
+                            ),
+                          );
+                        }
+                        return GestureDetector(
+                          onTap: () => _showFullVideo(controller),
+                          child: Stack(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: SizedBox(
+                                  width: 150,
+                                  height: 100,
+                                  child: AspectRatio(
+                                    aspectRatio: controller.value.aspectRatio,
+                                    child: VideoPlayer(controller),
+                                  ),
+                                ),
+                              ),
+                              Positioned(
+                                top: 0,
+                                right: 0,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    setState(() {
+                                      controller.pause();
+                                      _videos.remove(path);
+                                      _videoControllers.remove(path)?.dispose();
+                                    });
+                                  },
+                                  child: const CircleAvatar(
+                                    radius: 12,
+                                    backgroundColor: Colors.red,
+                                    child: Icon(
+                                      Icons.close,
+                                      size: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                ],
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.image, size: 32),
+                      onPressed: () => _pickImage(fromCamera: false),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.camera_alt, size: 32),
+                      onPressed: () => _pickImage(fromCamera: true),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.videocam, size: 32),
+                      onPressed: () => _pickVideo(fromCamera: false),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.videocam_outlined, size: 32),
+                      onPressed: () => _pickVideo(fromCamera: true),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: selectedBackgroundColor,
+            foregroundColor: selectedTextColor,
+            onPressed: () => saveNote(context),
+            child: const Icon(Icons.save, size: 28),
+          ),
+        );
+      },
+    );
+  }
+}
