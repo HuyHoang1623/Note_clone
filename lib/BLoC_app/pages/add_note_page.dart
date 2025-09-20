@@ -123,3 +123,35 @@ class _AddNotePageState extends State<AddNotePage> {
       },
     );
   }
+
+  void saveNote(BuildContext context) {
+    final title = titleController.text.trim();
+    final content = contentController.text.trim();
+
+    if (title.isEmpty && content.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Vui lòng điền đầy đủ thông tin")),
+      );
+      return;
+    }
+
+    final newNote = Note(
+      id: widget.note?.id ?? UniqueKey().toString(),
+      title: title,
+      content: content,
+      date: DateTime.now(),
+      backgroundColor: selectedBackgroundColor,
+      textColor: selectedTextColor,
+      imagePaths: _images,
+      videoPaths: _videos,
+    );
+
+    final bloc = context.read<NoteBloc>();
+    if (widget.note == null) {
+      bloc.add(AddNote(newNote));
+    } else {
+      bloc.add(UpdateNote(newNote));
+    }
+    Navigator.pop(context);
+  }
+
