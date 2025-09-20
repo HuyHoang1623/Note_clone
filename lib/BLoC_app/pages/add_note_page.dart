@@ -23,3 +23,11 @@ class _AddNotePageState extends State<AddNotePage> {
 
     selectedBackgroundColor = widget.note?.backgroundColor ?? Colors.white;
     selectedTextColor = widget.note?.textColor ?? Colors.black87;
+
+    _images = List.from(widget.note?.imagePaths ?? []);
+    _videos = List.from(widget.note?.videoPaths ?? []);
+
+    for (var path in _videos) {
+      _initVideoController(path);
+    }
+  }
