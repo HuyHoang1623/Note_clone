@@ -13,3 +13,8 @@ class _AddNotePageState extends State<AddNotePage> {
   late final TextEditingController contentController;
   late Color selectedBackgroundColor;
   late Color selectedTextColor;
+  final _picker = ImagePicker();
+
+  List<String> _images = [];
+  List<String> _videos = [];
+  final Map<String, VideoPlayerController> _videoControllers = {};
