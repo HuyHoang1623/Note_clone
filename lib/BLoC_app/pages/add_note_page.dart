@@ -68,3 +68,58 @@ class _AddNotePageState extends State<AddNotePage> {
       });
     _videoControllers[path] = controller;
   }
+  void _showFullVideo(VideoPlayerController controller) {
+    showDialog(
+      context: context,
+      builder: (_) {
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return Dialog(
+              backgroundColor: Colors.black,
+              insetPadding: EdgeInsets.zero,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  AspectRatio(
+                    aspectRatio: controller.value.aspectRatio,
+                    child: VideoPlayer(controller),
+                  ),
+                  IconButton(
+                    icon: Icon(
+                      controller.value.isPlaying
+                          ? Icons.pause_circle
+                          : Icons.play_circle,
+                      color: Colors.white,
+                      size: 60,
+                    ),
+                    onPressed: () {
+                      setStateDialog(() {
+                        controller.value.isPlaying
+                            ? controller.pause()
+                            : controller.play();
+                      });
+                    },
+                  ),
+                  Positioned(
+                    top: 30,
+                    right: 20,
+                    child: IconButton(
+                      icon: const Icon(
+                        Icons.close,
+                        color: Colors.red,
+                        size: 32,
+                      ),
+                      onPressed: () {
+                        controller.pause();
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
