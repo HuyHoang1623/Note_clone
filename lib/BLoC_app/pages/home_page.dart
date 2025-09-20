@@ -54,3 +54,49 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildNoteItem(BuildContext context, Note note) {
+    return Card(
+      color: note.backgroundColor,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: () => _showNoteMenu(context, note),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                note.title,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: note.textColor,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                note.content,
+                style: TextStyle(color: note.textColor),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.bottomRight,
+                child: Text(
+                  "${note.date.day}/${note.date.month}/${note.date.year}",
+                  style: TextStyle(
+                    color: note.textColor.withOpacity(0.7),
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
