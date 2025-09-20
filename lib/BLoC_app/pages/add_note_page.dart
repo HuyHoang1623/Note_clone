@@ -7,3 +7,6 @@ class AddNotePage extends StatefulWidget {
   @override
   State<AddNotePage> createState() => _AddNotePageState();
 }
+class _AddNotePageState extends State<AddNotePage> {
+  late final TextEditingController titleController;
+  late final TextEditingController contentController;
