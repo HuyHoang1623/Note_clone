@@ -155,3 +155,18 @@ class _AddNotePageState extends State<AddNotePage> {
     Navigator.pop(context);
   }
 
+  InputDecoration fieldDecoration(String label) {
+    return InputDecoration(
+      labelText: label,
+      labelStyle: TextStyle(color: selectedTextColor),
+      filled: true,
+      fillColor: selectedBackgroundColor,
+      enabledBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: selectedTextColor.withOpacity(0.7)),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderSide: BorderSide(color: selectedTextColor, width: 2),
+      ),
+    );
+  }
+
