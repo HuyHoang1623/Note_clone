@@ -109,3 +109,68 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(title: const Text("Ghi chú của tôi"), actions: [
         ],
       ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: TextField(
+              decoration: const InputDecoration(
+                hintText: "Tìm kiếm ghi chú...",
+                prefixIcon: Icon(Icons.search),
+              ),
+              onChanged: (query) =>
+                  context.read<NoteBloc>().add(SearchNotes(query)),
+            ),
+          ),
+          Expanded(
+            child: BlocBuilder<NoteBloc, NoteState>(
+              builder: (context, state) {
+                if (state.filteredNotes.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "Không tìm thấy ghi chú nào",
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      ),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  itemCount: state.filteredNotes.length,
+                  itemBuilder: (_, i) =>
+                      _buildNoteItem(context, state.filteredNotes[i]),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => _openAddNote(context),
+        child: const Icon(Icons.add, size: 28),
+      ),
+      bottomNavigationBar: BottomAppBar(
+        shape: const CircularNotchedRectangle(),
+        notchMargin: 6.0,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.home, size: 28),
+              onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.checklist, size: 28),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (_) => const ToDoListPage()),
+                );
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
