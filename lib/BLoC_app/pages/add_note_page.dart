@@ -40,3 +40,23 @@ class _AddNotePageState extends State<AddNotePage> {
     }
     super.dispose();
   }
+  Future<void> _pickImage({bool fromCamera = false}) async {
+    final picked = await _picker.pickImage(
+      source: fromCamera ? ImageSource.camera : ImageSource.gallery,
+    );
+    if (picked != null) {
+      setState(() => _images.add(picked.path));
+    }
+  }
+
+  Future<void> _pickVideo({bool fromCamera = false}) async {
+    final picked = await _picker.pickVideo(
+      source: fromCamera ? ImageSource.camera : ImageSource.gallery,
+    );
+    if (picked != null) {
+      setState(() {
+        _videos.add(picked.path);
+        _initVideoController(picked.path);
+      });
+    }
+  }
