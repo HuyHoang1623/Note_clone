@@ -60,3 +60,11 @@ class _AddNotePageState extends State<AddNotePage> {
       });
     }
   }
+
+  void _initVideoController(String path) {
+    final controller = VideoPlayerController.file(File(path))
+      ..initialize().then((_) {
+        setState(() {});
+      });
+    _videoControllers[path] = controller;
+  }
