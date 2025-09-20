@@ -170,3 +170,11 @@ class _AddNotePageState extends State<AddNotePage> {
     );
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<NoteBloc, NoteState>(
+      builder: (context, state) {
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(widget.note == null ? "Thêm Ghi Chú" : "Sửa Ghi Chú"),
+          ),
