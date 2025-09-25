@@ -17,7 +17,7 @@ class ToDoListPage extends StatelessWidget {
     void addTask() {
       final title = taskController.text.trim();
       if (title.isNotEmpty) {
-        final task = Task(title: title, createdAt: DateTime.now());
+        final task = Task(title: title, createdAt: DateTime.now(), id: '');
         context.read<TaskBloc>().add(AddTask(task));
         taskController.clear();
       }
