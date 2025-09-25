@@ -42,4 +42,30 @@ class Note {
       videoPaths: videoPaths ?? this.videoPaths,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'content': content,
+      'date': date.toIso8601String(),
+      'backgroundColor': backgroundColor.value,
+      'textColor': textColor.value,
+      'imagePaths': imagePaths,
+      'videoPaths': videoPaths,
+    };
+  }
+
+  factory Note.fromJson(Map<String, dynamic> json) {
+    return Note(
+      id: json['id'],
+      title: json['title'],
+      content: json['content'],
+      date: DateTime.parse(json['date']),
+      backgroundColor: Color(json['backgroundColor']),
+      textColor: Color(json['textColor']),
+      imagePaths: List<String>.from(json['imagePaths'] ?? []),
+      videoPaths: List<String>.from(json['videoPaths'] ?? []),
+    );
+  }
 }
