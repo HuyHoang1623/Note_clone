@@ -81,11 +81,9 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   void _initVideoController(String path) {
-    final controller = VideoPlayerController.file(File(path))
-      ..initialize().then((_) {
-        setState(() {});
-      });
+    final controller = VideoPlayerController.file(File(path));
     _videoControllers[path] = controller;
+    controller.initialize();
   }
 
   void _showFullVideo(VideoPlayerController controller) {
@@ -308,8 +306,7 @@ class _AddNotePageState extends State<AddNotePage> {
                     child: Row(
                       children: _videos.map((path) {
                         final controller = _videoControllers[path];
-                        if (controller == null ||
-                            !controller.value.isInitialized) {
+                        if (controller == null) {
                           return const Padding(
                             padding: EdgeInsets.all(4),
                             child: Icon(
