@@ -1,14 +1,29 @@
 enum TaskStatus { ongoing, completed }
 
 class Task {
-  String id = DateTime.now().microsecondsSinceEpoch.toString();
-  String title;
-  DateTime createdAt;
-  TaskStatus status;
+  final String id;
+  final String title;
+  final DateTime createdAt;
+  final TaskStatus status;
 
   Task({
+    String? id,
     required this.title,
     required this.createdAt,
     this.status = TaskStatus.ongoing,
-  });
+  }) : id = id ?? DateTime.now().microsecondsSinceEpoch.toString();
+
+  Task copyWith({
+    String? id,
+    String? title,
+    DateTime? createdAt,
+    TaskStatus? status,
+  }) {
+    return Task(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      createdAt: createdAt ?? this.createdAt,
+      status: status ?? this.status,
+    );
+  }
 }
