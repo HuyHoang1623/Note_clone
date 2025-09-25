@@ -1,28 +1,34 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_even.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_state.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:note_clone/core/local_store.dart';
 
 class NoteBloc extends Bloc<NoteEvent, NoteState> {
   NoteBloc() : super(const NoteState()) {
-    on<LoadNotes>((event, emit) {
-      emit(state.copyWith(notes: [], filteredNotes: []));
+    on<LoadNotes>((event, emit) async {
+      final notes = await LocalStorage.loadNotes();
+      emit(state.copyWith(notes: notes, filteredNotes: notes));
     });
 
-    on<AddNote>((event, emit) {
+    on<AddNote>((event, emit) async {
       final updated = [...state.notes, event.note];
       emit(state.copyWith(notes: updated, filteredNotes: updated));
+      await LocalStorage.saveNote(event.note);
     });
 
-    on<UpdateNote>((event, emit) {
+    on<UpdateNote>((event, emit) async {
       final updated = state.notes
           .map((n) => n.id == event.note.id ? event.note : n)
           .toList();
       emit(state.copyWith(notes: updated, filteredNotes: updated));
+      await LocalStorage.saveNote(event.note);
     });
 
-    on<DeleteNote>((event, emit) {
+    on<DeleteNote>((event, emit) async {
       final updated = state.notes.where((n) => n.id != event.id).toList();
       emit(state.copyWith(notes: updated, filteredNotes: updated));
+      await LocalStorage.deleteNote(event.id);
     });
 
     on<SearchNotes>((event, emit) {
