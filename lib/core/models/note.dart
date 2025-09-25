@@ -1,12 +1,14 @@
-import 'package:flutter/animation.dart';
+import 'package:flutter/material.dart';
 
 class Note {
-  String id;
-  String title;
-  String content;
-  DateTime date;
-  Color backgroundColor;
-  Color textColor;
+  final String id;
+  final String title;
+  final String content;
+  final DateTime date;
+  final Color backgroundColor;
+  final Color textColor;
+  final List<String> imagePaths;
+  final List<String> videoPaths;
 
   Note({
     String? id,
@@ -15,5 +17,29 @@ class Note {
     required this.date,
     required this.backgroundColor,
     required this.textColor,
+    this.imagePaths = const [],
+    this.videoPaths = const [],
   }) : id = id ?? DateTime.now().microsecondsSinceEpoch.toString();
+
+  Note copyWith({
+    String? id,
+    String? title,
+    String? content,
+    DateTime? date,
+    Color? backgroundColor,
+    Color? textColor,
+    List<String>? imagePaths,
+    List<String>? videoPaths,
+  }) {
+    return Note(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      content: content ?? this.content,
+      date: date ?? this.date,
+      backgroundColor: backgroundColor ?? this.backgroundColor,
+      textColor: textColor ?? this.textColor,
+      imagePaths: imagePaths ?? this.imagePaths,
+      videoPaths: videoPaths ?? this.videoPaths,
+    );
+  }
 }
