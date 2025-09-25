@@ -26,4 +26,22 @@ class Task {
       status: status ?? this.status,
     );
   }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'title': title,
+      'createdAt': createdAt.toIso8601String(),
+      'status': status.index,
+    };
+  }
+
+  factory Task.fromJson(Map<String, dynamic> json) {
+    return Task(
+      id: json['id'],
+      title: json['title'],
+      createdAt: DateTime.parse(json['createdAt']),
+      status: TaskStatus.values[json['status']],
+    );
+  }
 }
