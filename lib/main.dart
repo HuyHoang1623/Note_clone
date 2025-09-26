@@ -3,12 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_bloc.dart';
 import 'package:note_clone/BLoC_app/BLoC/task/task_bloc.dart';
 import 'package:note_clone/BLoC_app/pages/home_page.dart';
+import 'package:note_clone/BLoC_app/BLoC/note/note_event.dart';
 
 void main() {
   runApp(
     MultiBlocProvider(
       providers: [
-        BlocProvider(create: (_) => NoteBloc()),
+        BlocProvider(create: (_) => NoteBloc()..add(LoadNotes())),
         BlocProvider(create: (_) => TaskBloc()),
       ],
       child: const MyApp(),
