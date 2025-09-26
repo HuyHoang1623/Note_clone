@@ -1,8 +1,7 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:note_clone/BLoC_app/BLoC/note/note_even.dart';
+import 'package:note_clone/BLoC_app/BLoC/note/note_event.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_state.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:note_clone/core/local_store.dart';
+import 'package:note_clone/core/local_storage.dart';
 
 class NoteBloc extends Bloc<NoteEvent, NoteState> {
   NoteBloc() : super(const NoteState()) {

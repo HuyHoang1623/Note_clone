@@ -2,6 +2,10 @@ import 'package:note_clone/core/models/task.dart';
 
 abstract class TaskEvent {}
 
+class LoadTasks extends TaskEvent {
+  LoadTasks();
+}
+
 class AddTask extends TaskEvent {
   final Task task;
   AddTask(this.task);
