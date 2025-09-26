@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_bloc.dart';
-import 'package:note_clone/BLoC_app/BLoC/note/note_even.dart';
+import 'package:note_clone/BLoC_app/BLoC/note/note_event.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_state.dart';
 import 'package:note_clone/core/color_pair.dart';
 import 'package:note_clone/core/models/note.dart';

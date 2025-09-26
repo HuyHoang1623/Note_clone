@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_bloc.dart';
-import 'package:note_clone/BLoC_app/BLoC/note/note_even.dart';
+import 'package:note_clone/BLoC_app/BLoC/note/note_event.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_state.dart';
 import 'package:note_clone/core/models/note.dart';
 import 'package:note_clone/BLoC_app/pages/add_note_page.dart';
