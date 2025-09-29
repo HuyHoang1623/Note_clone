@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "475389689247",
+    "project_id": "noteclone-41a11",
+    "storage_bucket": "noteclone-41a11.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:475389689247:android:36c214e1e097f445eed1aa",
+        "android_client_info": {
+          "package_name": "com.example.note_clone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB6Z03pVFYLjAs7cxwi4Sr2jW-AHWpgR5k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
