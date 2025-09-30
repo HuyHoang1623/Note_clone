@@ -4,13 +4,19 @@ import 'package:note_clone/BLoC_app/BLoC/note/note_bloc.dart';
 import 'package:note_clone/BLoC_app/BLoC/task/task_bloc.dart';
 import 'package:note_clone/BLoC_app/pages/home_page.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_event.dart';
+import 'package:note_clone/BLoC_app/BLoC/task/task_event.dart';
+import 'firebase_options.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
   runApp(
     MultiBlocProvider(
       providers: [
         BlocProvider(create: (_) => NoteBloc()..add(LoadNotes())),
-        BlocProvider(create: (_) => TaskBloc()),
+        BlocProvider(create: (_) => TaskBloc()..add(LoadTasks())),
       ],
       child: const MyApp(),
     ),
