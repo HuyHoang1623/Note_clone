@@ -29,6 +29,35 @@ class _SignInPageState extends State<SignInPage> {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Email hoặc mật khẩu không đúng")),
       );
+  Future<void> signInWithFacebook() async {
+    try {
+      final LoginResult result = await FacebookAuth.instance.login();
+      if (result.status != LoginStatus.success) return;
+
+      final OAuthCredential credential = FacebookAuthProvider.credential(
+        result.accessToken!.tokenString,
+      );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
+
+      final user = userCredential.user!;
+      final userDoc = _db.collection('users').doc(user.uid);
+
+      if (!(await userDoc.get()).exists) {
+        await userDoc.set({
+          'email': user.email,
+          'name': user.displayName,
+          'photoUrl': user.photoURL,
+          'provider': 'facebook',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Lỗi Facebook: $e")));
     }
   }
 
