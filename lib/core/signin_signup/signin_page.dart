@@ -28,7 +28,43 @@ class _SignInPageState extends State<SignInPage> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Email hoặc mật khẩu không đúng")),
+  Future<void> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      if (googleUser == null) return;
+
+      final GoogleSignInAuthentication googleAuth =
+          await googleUser.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
       );
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
+
+      final user = userCredential.user!;
+      final userDoc = _db.collection('users').doc(user.uid);
+
+      if (!(await userDoc.get()).exists) {
+        await userDoc.set({
+          'email': user.email,
+          'name': user.displayName,
+          'photoUrl': user.photoURL,
+          'provider': 'google',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+      }
+      ;
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Lỗi Google: $e")));
+    }
+  }
+
   Future<void> signInWithFacebook() async {
     try {
       final LoginResult result = await FacebookAuth.instance.login();
