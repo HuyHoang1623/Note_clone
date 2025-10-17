@@ -8,6 +8,7 @@ import 'package:note_clone/BLoC_app/BLoC/note/note_state.dart';
 import 'package:note_clone/core/color_pair.dart';
 import 'package:note_clone/core/models/note.dart';
 import 'package:video_player/video_player.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddNotePage extends StatefulWidget {
   final Note? note;
@@ -153,8 +154,19 @@ class _AddNotePageState extends State<AddNotePage> {
       return;
     }
 
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Vui lòng đăng nhập để lưu ghi chú")),
+      );
+      return;
+    }
+
+    final uid = user.uid;
+
     final newNote = Note(
       id: widget.note?.id ?? UniqueKey().toString(),
+      uid: uid,
       title: title,
       content: content,
       date: DateTime.now(),
@@ -166,9 +178,9 @@ class _AddNotePageState extends State<AddNotePage> {
 
     final bloc = context.read<NoteBloc>();
     if (widget.note == null) {
-      bloc.add(AddNote(newNote));
+      bloc.add(AddNote(newNote, uid));
     } else {
-      bloc.add(UpdateNote(newNote));
+      bloc.add(UpdateNote(newNote, uid));
     }
     Navigator.pop(context);
   }

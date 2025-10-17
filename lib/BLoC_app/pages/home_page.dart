@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_bloc.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_event.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_state.dart';
@@ -7,8 +8,23 @@ import 'package:note_clone/core/models/note.dart';
 import 'package:note_clone/BLoC_app/pages/add_note_page.dart';
 import 'package:note_clone/BLoC_app/pages/to_do_list_page.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  late final String uid;
+
+  @override
+  void initState() {
+    super.initState();
+    uid = FirebaseAuth.instance.currentUser!.uid;
+
+    context.read<NoteBloc>().add(LoadNotes(uid));
+  }
 
   void _openAddNote(BuildContext context, [Note? note]) async {
     final newNote = await Navigator.push<Note>(
@@ -18,9 +34,9 @@ class HomePage extends StatelessWidget {
 
     if (newNote != null) {
       if (note == null) {
-        context.read<NoteBloc>().add(AddNote(newNote));
+        context.read<NoteBloc>().add(AddNote(newNote, uid));
       } else {
-        context.read<NoteBloc>().add(UpdateNote(newNote));
+        context.read<NoteBloc>().add(UpdateNote(newNote, uid));
       }
     }
   }
@@ -55,7 +71,7 @@ class HomePage extends StatelessWidget {
               ),
               onTap: () {
                 Navigator.pop(context);
-                context.read<NoteBloc>().add(DeleteNote(note.id));
+                context.read<NoteBloc>().add(DeleteNote(note.id, uid));
               },
             ),
           ],
@@ -115,9 +131,7 @@ class HomePage extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Ghi chú của tôi"), actions: [
-        ],
-      ),
+      appBar: AppBar(title: const Text("Ghi chú của tôi")),
       body: Column(
         children: [
           Padding(
@@ -170,12 +184,10 @@ class HomePage extends StatelessWidget {
             ),
             IconButton(
               icon: const Icon(Icons.checklist, size: 28),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => const ToDoListPage()),
-                );
-              },
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ToDoListPage()),
+              ),
             ),
           ],
         ),
