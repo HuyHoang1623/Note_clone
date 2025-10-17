@@ -10,7 +10,7 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
     on<LoadNotes>((event, emit) async {
       List<Note> notes = [];
       try {
-        notes = await CloudStorage.getNotes();
+        notes = await CloudStorage.getNotes(event.uid);
         for (var n in notes) {
           await LocalStorage.saveNote(n);
         }
@@ -24,35 +24,32 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
     });
 
     on<AddNote>((event, emit) async {
-      final updated = [...state.notes, event.note];
+      final note = event.note.copyWith(uid: event.uid);
+      final updated = [...state.notes, note];
       emit(state.copyWith(notes: updated, filteredNotes: updated));
-
-      await LocalStorage.saveNote(event.note);
+      await LocalStorage.saveNote(note);
       try {
-        await CloudStorage.addNote(event.note);
+        await CloudStorage.addNote(note, event.uid);
       } catch (_) {}
     });
 
-    /// UPDATE NOTE
     on<UpdateNote>((event, emit) async {
-      final updated = state.notes
+      final updatedNotes = state.notes
           .map((n) => n.id == event.note.id ? event.note : n)
           .toList();
-      emit(state.copyWith(notes: updated, filteredNotes: updated));
-
+      emit(state.copyWith(notes: updatedNotes, filteredNotes: updatedNotes));
       await LocalStorage.saveNote(event.note);
       try {
-        await CloudStorage.addNote(event.note);
+        await CloudStorage.updateNote(event.note, event.uid);
       } catch (_) {}
     });
 
     on<DeleteNote>((event, emit) async {
-      final updated = state.notes.where((n) => n.id != event.id).toList();
-      emit(state.copyWith(notes: updated, filteredNotes: updated));
-
+      final updatedNotes = state.notes.where((n) => n.id != event.id).toList();
+      emit(state.copyWith(notes: updatedNotes, filteredNotes: updatedNotes));
       await LocalStorage.deleteNote(event.id);
       try {
-        await CloudStorage.deleteNote(event.id);
+        await CloudStorage.deleteNote(event.id, event.uid);
       } catch (_) {}
     });
 

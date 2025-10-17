@@ -2,21 +2,27 @@ import 'package:note_clone/core/models/note.dart';
 
 abstract class NoteEvent {}
 
-class LoadNotes extends NoteEvent {}
+class LoadNotes extends NoteEvent {
+  final String uid;
+  LoadNotes(this.uid);
+}
 
 class AddNote extends NoteEvent {
   final Note note;
-  AddNote(this.note);
+  final String uid;
+  AddNote(this.note, this.uid);
 }
 
 class UpdateNote extends NoteEvent {
   final Note note;
-  UpdateNote(this.note);
+  final String uid;
+  UpdateNote(this.note, this.uid);
 }
 
 class DeleteNote extends NoteEvent {
   final String id;
-  DeleteNote(this.id);
+  final String uid;
+  DeleteNote(this.id, this.uid);
 }
 
 class SearchNotes extends NoteEvent {

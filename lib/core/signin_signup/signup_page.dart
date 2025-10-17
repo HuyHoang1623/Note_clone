@@ -48,6 +48,7 @@ class SignUpPageState extends State<SignUpPage> {
       );
 
       await _db.collection('users').doc(userCredential.user!.uid).set({
+        'uid': userCredential.user!.uid,
         'email': email,
         'role': 'user',
         'provider': 'email',

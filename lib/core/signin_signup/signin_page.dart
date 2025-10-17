@@ -78,6 +78,7 @@ class _SignInPageState extends State<SignInPage> {
 
       if (!(await userDoc.get()).exists) {
         await userDoc.set({
+          'uid': user.uid,
           'email': user.email,
           'name': user.displayName,
           'photoUrl': user.photoURL,
@@ -118,6 +119,7 @@ class _SignInPageState extends State<SignInPage> {
 
       if (!(await userDoc.get()).exists) {
         await userDoc.set({
+          'uid': user.uid,
           'email': user.email,
           'name': user.displayName,
           'photoUrl': user.photoURL,

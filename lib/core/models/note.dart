@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class Note {
+  final String uid;
   final String id;
   final String title;
   final String content;
@@ -12,6 +13,7 @@ class Note {
 
   Note({
     String? id,
+    required this.uid,
     required this.title,
     required this.content,
     required this.date,
@@ -23,6 +25,7 @@ class Note {
 
   Note copyWith({
     String? id,
+    String? uid,
     String? title,
     String? content,
     DateTime? date,
@@ -33,6 +36,7 @@ class Note {
   }) {
     return Note(
       id: id ?? this.id,
+      uid: uid ?? this.uid,
       title: title ?? this.title,
       content: content ?? this.content,
       date: date ?? this.date,
@@ -46,6 +50,7 @@ class Note {
   Map<String, dynamic> toJson() {
     return {
       'id': id,
+      'uid': uid,
       'title': title,
       'content': content,
       'date': date.toIso8601String(),
@@ -59,6 +64,7 @@ class Note {
   factory Note.fromJson(Map<String, dynamic> json) {
     return Note(
       id: json['id'],
+      uid: json['uid'],
       title: json['title'],
       content: json['content'],
       date: DateTime.parse(json['date']),
