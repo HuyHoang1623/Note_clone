@@ -29,3 +29,5 @@ class SearchNotes extends NoteEvent {
   final String query;
   SearchNotes(this.query);
 }
+
+class ClearNotes extends NoteEvent {}
