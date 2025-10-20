@@ -5,8 +5,10 @@ import 'package:note_clone/BLoC_app/BLoC/note/note_bloc.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_event.dart';
 import 'package:note_clone/BLoC_app/BLoC/note/note_state.dart';
 import 'package:note_clone/core/models/note.dart';
+import 'package:note_clone/core/local_storage.dart';
 import 'package:note_clone/BLoC_app/pages/add_note_page.dart';
 import 'package:note_clone/BLoC_app/pages/to_do_list_page.dart';
+import 'package:note_clone/core/signin_signup/signin_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -21,9 +23,19 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    uid = FirebaseAuth.instance.currentUser!.uid;
+    final user = FirebaseAuth.instance.currentUser;
 
-    context.read<NoteBloc>().add(LoadNotes(uid));
+    if (user == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const SignInPage()),
+        );
+      });
+    } else {
+      uid = user.uid;
+      context.read<NoteBloc>().add(LoadNotes(uid));
+    }
   }
 
   void _openAddNote(BuildContext context, [Note? note]) async {
@@ -38,6 +50,25 @@ class _HomePageState extends State<HomePage> {
       } else {
         context.read<NoteBloc>().add(UpdateNote(newNote, uid));
       }
+    }
+  }
+
+  Future<void> _signOut() async {
+    try {
+      await LocalStorage.clearAll();
+      await FirebaseAuth.instance.signOut();
+
+      if (mounted) {
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (_) => const SignInPage()),
+          (route) => false,
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Lỗi khi đăng xuất: $e")));
     }
   }
 
@@ -131,7 +162,12 @@ class _HomePageState extends State<HomePage> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("Ghi chú của tôi")),
+      appBar: AppBar(
+        title: const Text("Ghi chú của tôi"),
+        actions: [
+          IconButton(icon: const Icon(Icons.logout), onPressed: _signOut),
+        ],
+      ),
       body: Column(
         children: [
           Padding(
