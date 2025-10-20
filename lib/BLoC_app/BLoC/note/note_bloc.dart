@@ -15,10 +15,7 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
           await LocalStorage.saveNote(n);
         }
       } catch (e) {
-        final localNotes = await LocalStorage.loadNotes();
-        notes = localNotes
-            .map((e) => Note.fromJson(e as Map<String, dynamic>))
-            .toList();
+        notes = await LocalStorage.loadNotes();
       }
       emit(state.copyWith(notes: notes, filteredNotes: notes));
     });
