@@ -63,5 +63,10 @@ class NoteBloc extends Bloc<NoteEvent, NoteState> {
           .toList();
       emit(state.copyWith(filteredNotes: filtered));
     });
+
+    on<ClearNotes>((event, emit) async {
+      await LocalStorage.clearAll();
+      emit(state.copyWith(notes: [], filteredNotes: []));
+    });
   }
 }
