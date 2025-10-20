@@ -10,9 +10,11 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     on<LoadTasks>((event, emit) async {
       List<Task> tasks = [];
       try {
-        tasks = await CloudStorage.getTasks();
-        for (var t in tasks) await LocalStorage.saveTask(t);
-      } catch (_) {
+        tasks = await CloudStorage.getTasks(event.uid);
+        for (var t in tasks) {
+          await LocalStorage.saveTask(t);
+        }
+      } catch (e) {
         final local = await LocalStorage.loadTasks();
         tasks = local
             .map((e) => Task.fromJson(e as Map<String, dynamic>))
