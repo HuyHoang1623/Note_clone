@@ -5,6 +5,7 @@ import 'package:note_clone/BLoC_app/BLoC/task/task_event.dart';
 import 'package:note_clone/BLoC_app/BLoC/task/task_state.dart';
 import 'package:note_clone/BLoC_app/pages/home_page.dart';
 import 'package:note_clone/core/models/task.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ToDoListPage extends StatelessWidget {
   const ToDoListPage({super.key});
@@ -16,10 +17,17 @@ class ToDoListPage extends StatelessWidget {
 
     void addTask() {
       final title = taskController.text.trim();
-      if (title.isNotEmpty) {
-        final task = Task(title: title, createdAt: DateTime.now(), id: '');
-        context.read<TaskBloc>().add(AddTask(task));
+      final user = FirebaseAuth.instance.currentUser;
+      if (title.isNotEmpty && user != null) {
+        final task = Task(
+          uid: user.uid,
+          title: title,
+          createdAt: DateTime.now(),
+          id: DateTime.now().microsecondsSinceEpoch.toString(),
+        );
+        context.read<TaskBloc>().add(AddTask(task, user.uid));
         taskController.clear();
+        FocusScope.of(context).unfocus();
       }
     }
 
@@ -35,7 +43,7 @@ class ToDoListPage extends StatelessWidget {
                   child: TextField(
                     controller: taskController,
                     decoration: const InputDecoration(
-                      hintText: "Việc cần làm",
+                      hintText: "Nhập việc cần làm...",
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -48,6 +56,12 @@ class ToDoListPage extends StatelessWidget {
             Expanded(
               child: BlocBuilder<TaskBloc, TaskState>(
                 builder: (context, state) {
+                  if (state.tasks.isEmpty) {
+                    return const Center(
+                      child: Text("Chưa có việc nào, hãy thêm mới nhé!"),
+                    );
+                  }
+
                   final ongoing = state.tasks
                       .where((t) => t.status == TaskStatus.ongoing)
                       .toList();
@@ -65,26 +79,43 @@ class ToDoListPage extends StatelessWidget {
                         (task) => ListTile(
                           leading: Checkbox(
                             value: false,
-                            onChanged: (_) =>
-                                context.read<TaskBloc>().add(ToggleTask(task)),
+                            onChanged: (_) {
+                              final user = FirebaseAuth.instance.currentUser;
+                              if (user != null) {
+                                context.read<TaskBloc>().add(
+                                  ToggleTask(task, user.uid),
+                                );
+                              }
+                            },
                           ),
                           title: Text(task.title),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => context.read<TaskBloc>().add(
-                              DeleteTask(task.id),
-                            ),
+                            onPressed: () {
+                              final user = FirebaseAuth.instance.currentUser;
+                              if (user != null) {
+                                context.read<TaskBloc>().add(
+                                  DeleteTask(task.id, user.uid),
+                                );
+                              }
+                            },
                           ),
                         ),
                       ),
-                      const SizedBox(height: 16),
+                      const Divider(height: 30, thickness: 1),
                       Text("Đã hoàn thành", style: theme.textTheme.titleLarge),
                       ...completed.map(
                         (task) => ListTile(
                           leading: Checkbox(
                             value: true,
-                            onChanged: (_) =>
-                                context.read<TaskBloc>().add(ToggleTask(task)),
+                            onChanged: (_) {
+                              final user = FirebaseAuth.instance.currentUser;
+                              if (user != null) {
+                                context.read<TaskBloc>().add(
+                                  ToggleTask(task, user.uid),
+                                );
+                              }
+                            },
                           ),
                           title: Text(
                             task.title,
@@ -95,9 +126,14 @@ class ToDoListPage extends StatelessWidget {
                           ),
                           trailing: IconButton(
                             icon: const Icon(Icons.delete, color: Colors.red),
-                            onPressed: () => context.read<TaskBloc>().add(
-                              DeleteTask(task.id),
-                            ),
+                            onPressed: () {
+                              final user = FirebaseAuth.instance.currentUser;
+                              if (user != null) {
+                                context.read<TaskBloc>().add(
+                                  DeleteTask(task.id, user.uid),
+                                );
+                              }
+                            },
                           ),
                         ),
                       ),
