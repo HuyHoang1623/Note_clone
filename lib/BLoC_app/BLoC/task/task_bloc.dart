@@ -15,21 +15,19 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
           await LocalStorage.saveTask(t);
         }
       } catch (e) {
-        final local = await LocalStorage.loadTasks();
-        tasks = local
-            .map((e) => Task.fromJson(e as Map<String, dynamic>))
-            .toList();
+        tasks = await LocalStorage.loadTasks();
       }
       emit(state.copyWith(tasks: tasks));
     });
 
     on<AddTask>((event, emit) async {
-      final updated = [...state.tasks, event.task];
+      final task = event.task.copyWith(uid: event.uid);
+      final updated = [...state.tasks, task];
       emit(state.copyWith(tasks: updated));
 
-      await LocalStorage.saveTask(event.task);
+      await LocalStorage.saveTask(task);
       try {
-        await CloudStorage.addTask(event.task);
+        await CloudStorage.addTask(task, event.uid);
       } catch (_) {}
     });
 
@@ -39,7 +37,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
 
       await LocalStorage.deleteTask(event.id);
       try {
-        await CloudStorage.deleteTask(event.id);
+        await CloudStorage.deleteTask(event.id, event.uid);
       } catch (_) {}
     });
 
@@ -61,7 +59,7 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         if (t.id == event.task.id) {
           await LocalStorage.saveTask(t);
           try {
-            await CloudStorage.updateTask(t);
+            await CloudStorage.updateTask(t, event.uid);
           } catch (_) {}
           break;
         }

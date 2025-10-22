@@ -3,20 +3,24 @@ import 'package:note_clone/core/models/task.dart';
 abstract class TaskEvent {}
 
 class LoadTasks extends TaskEvent {
-  LoadTasks();
+  final String uid;
+  LoadTasks(this.uid);
 }
 
 class AddTask extends TaskEvent {
   final Task task;
-  AddTask(this.task);
+  final String uid;
+  AddTask(this.task, this.uid);
 }
 
 class DeleteTask extends TaskEvent {
   final String id;
-  DeleteTask(this.id);
+  final String uid;
+  DeleteTask(this.id, this.uid);
 }
 
 class ToggleTask extends TaskEvent {
   final Task task;
-  ToggleTask(this.task);
+  final String uid;
+  ToggleTask(this.task, this.uid);
 }
