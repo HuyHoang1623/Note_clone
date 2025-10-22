@@ -1,4 +1,4 @@
-import "dart:convert";
+import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:note_clone/core/models/note.dart';
 import 'package:note_clone/core/models/task.dart';
@@ -57,4 +57,9 @@ class LocalStorage {
   }
 
   static String taskKey(String id) => '$taskPrefix$id';
+
+  static Future<void> clearAll() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.clear();
+  }
 }
