@@ -101,6 +101,15 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       }
     });
 
+    on<ToggleWorkspaceTask>((event, emit) async {
+      if (state is TaskLoaded) {
+        final current = state as TaskLoaded;
+
+        final toggled = event.task.copyWith(
+          status: event.task.status == TaskStatus.ongoing
+              ? TaskStatus.completed
+              : TaskStatus.ongoing,
+        );
       }
     });
   }
