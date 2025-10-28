@@ -89,6 +89,18 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
       }
     });
 
+    on<DeleteWorkspaceTask>((event, emit) async {
+      if (state is TaskLoaded) {
+        final current = state as TaskLoaded;
+        await CloudStorage.deleteWorkspaceTask(event.workspaceId, event.taskId);
+
+        final updated = current.workspaceTasks
+            .where((t) => t.id != event.taskId)
+            .toList();
+        emit(current.copyWith(workspaceTasks: updated));
+      }
+    });
+
       }
     });
   }
