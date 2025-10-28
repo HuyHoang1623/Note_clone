@@ -78,6 +78,17 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         emit(TaskError("Không tải được task workspace"));
       }
     });
+    on<AddWorkspaceTask>((event, emit) async {
+      if (state is TaskLoaded) {
+        final current = state as TaskLoaded;
+        await CloudStorage.addWorkspaceTask(event.workspaceId, event.task);
+
+        final updated = List<Task>.from(current.workspaceTasks)
+          ..add(event.task);
+        emit(current.copyWith(workspaceTasks: updated));
+      }
+    });
+
       }
     });
   }
