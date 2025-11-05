@@ -16,3 +16,38 @@ class UserModel {
     this.provider = 'email',
     this.createdAt,
   });
+
+  factory UserModel.fromJson(Map<String, dynamic> json) {
+    return UserModel(
+      uid: json['uid'] as String? ?? json['id'] as String? ?? '',
+      email: json['email'] as String?,
+      name: json['name'] as String?,
+      photoUrl: json['photoUrl'] as String?,
+      provider: json['provider'] as String? ?? 'email',
+      createdAt: json['createdAt'] is Timestamp
+          ? json['createdAt'] as Timestamp
+          : (json['createdAt'] != null
+                ? Timestamp.fromDate(
+                    DateTime.parse(json['createdAt'].toString()),
+                  )
+                : null),
+    );
+  }
+
+  factory UserModel.fromFirestore(DocumentSnapshot doc) {
+    final data = doc.data() as Map<String, dynamic>? ?? {};
+    return UserModel(
+      uid: data['uid'] as String? ?? doc.id,
+      email: data['email'] as String?,
+      name: data['name'] as String?,
+      photoUrl: data['photoUrl'] as String?,
+      provider: data['provider'] as String? ?? 'email',
+      createdAt: data['createdAt'] is Timestamp
+          ? data['createdAt'] as Timestamp
+          : (data['createdAt'] != null
+                ? Timestamp.fromDate(
+                    DateTime.parse(data['createdAt'].toString()),
+                  )
+                : null),
+    );
+  }
