@@ -76,3 +76,47 @@ class UserModel {
     };
   }
 
+  UserModel copyWith({
+    String? uid,
+    String? email,
+    String? name,
+    String? photoUrl,
+    String? provider,
+    Timestamp? createdAt,
+  }) {
+    return UserModel(
+      uid: uid ?? this.uid,
+      email: email ?? this.email,
+      name: name ?? this.name,
+      photoUrl: photoUrl ?? this.photoUrl,
+      provider: provider ?? this.provider,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'UserModel(uid: $uid, email: $email, name: $name, provider: $provider)';
+  }
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UserModel &&
+          runtimeType == other.runtimeType &&
+          uid == other.uid &&
+          email == other.email &&
+          name == other.name &&
+          photoUrl == other.photoUrl &&
+          provider == other.provider &&
+          createdAt == other.createdAt;
+
+  @override
+  int get hashCode =>
+      uid.hashCode ^
+      (email?.hashCode ?? 0) ^
+      (name?.hashCode ?? 0) ^
+      (photoUrl?.hashCode ?? 0) ^
+      provider.hashCode ^
+      (createdAt?.hashCode ?? 0);
+}
