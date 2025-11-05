@@ -8,6 +8,7 @@ class Task {
   final String title;
   final DateTime createdAt;
   final TaskStatus status;
+  final String? workspaceId;
 
   Task({
     String? id,
@@ -15,6 +16,7 @@ class Task {
     required this.title,
     required this.createdAt,
     this.status = TaskStatus.ongoing,
+    this.workspaceId,
   }) : id = id ?? DateTime.now().microsecondsSinceEpoch.toString();
 
   Task copyWith({
@@ -23,6 +25,7 @@ class Task {
     String? title,
     DateTime? createdAt,
     TaskStatus? status,
+    String? workspaceId,
   }) {
     return Task(
       id: id ?? this.id,
@@ -30,6 +33,7 @@ class Task {
       title: title ?? this.title,
       createdAt: createdAt ?? this.createdAt,
       status: status ?? this.status,
+      workspaceId: workspaceId ?? this.workspaceId,
     );
   }
 
@@ -40,6 +44,7 @@ class Task {
       'title': title,
       'createdAt': createdAt.toIso8601String(),
       'status': status.index,
+      'workspaceId': workspaceId,
     };
   }
 
@@ -50,8 +55,10 @@ class Task {
       title: json['title'],
       createdAt: DateTime.parse(json['createdAt']),
       status: TaskStatus.values[json['status']],
+      workspaceId: json['workspaceId'],
     );
   }
+
   Map<String, dynamic> toFirestore() {
     return {
       'id': id,
@@ -59,6 +66,7 @@ class Task {
       'title': title,
       'createdAt': Timestamp.fromDate(createdAt),
       'status': status.index,
+      'workspaceId': workspaceId,
     };
   }
 
@@ -69,6 +77,7 @@ class Task {
       title: json['title'],
       createdAt: (json['createdAt'] as Timestamp).toDate(),
       status: TaskStatus.values[json['status']],
+      workspaceId: json['workspaceId'],
     );
   }
 }
