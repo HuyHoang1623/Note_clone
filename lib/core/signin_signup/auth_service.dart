@@ -54,6 +54,7 @@ class AuthService {
       throw Exception("Lỗi đăng nhập: $e");
     }
   }
+
   Future<void> signInWithGoogle() async {
     try {
       await GoogleSignIn().signOut();
@@ -108,3 +109,19 @@ class AuthService {
       throw Exception("Lỗi đăng nhập Facebook: $e");
     }
   }
+
+  Future<void> _saveUserToFirestore(UserModel user) async {
+    final userDoc = _db.collection('users').doc(user.uid);
+    final snapshot = await userDoc.get();
+
+    if (!snapshot.exists) {
+      await userDoc.set(user.toMap());
+    }
+  }
+
+  Future<void> signOut() async {
+    await _auth.signOut();
+    await GoogleSignIn().signOut();
+    await FacebookAuth.instance.logOut();
+  }
+}
