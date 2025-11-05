@@ -51,3 +51,28 @@ class UserModel {
                 : null),
     );
   }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'uid': uid,
+      'email': email,
+      'name': name,
+      'photoUrl': photoUrl,
+      'provider': provider,
+      'createdAt': createdAt ?? FieldValue.serverTimestamp(),
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'uid': uid,
+      'email': email,
+      'name': name,
+      'photoUrl': photoUrl,
+      'provider': provider,
+      'createdAt': createdAt != null
+          ? createdAt!.toDate().toIso8601String()
+          : null,
+    };
+  }
+
