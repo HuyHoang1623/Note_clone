@@ -1,7 +1,6 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'signin_page.dart';
+import 'package:note_clone/core/signin_signup/auth_service.dart';
+import 'package:note_clone/core/signin_signup/signin_page.dart';
 
 class SignUpPage extends StatefulWidget {
   const SignUpPage({super.key});
@@ -11,23 +10,28 @@ class SignUpPage extends StatefulWidget {
 }
 
 class SignUpPageState extends State<SignUpPage> {
+  final TextEditingController nameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final AuthService _authService = AuthService();
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+  bool _isLoading = false;
 
-  void signUp() async {
-    String email = emailController.text.trim();
-    String password = passwordController.text.trim();
-    String confirmPassword = confirmPasswordController.text.trim();
+  Future<void> signUp() async {
+    final name = nameController.text.trim();
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
+    if (name.isEmpty ||
+        email.isEmpty ||
+        password.isEmpty ||
+        confirmPassword.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Vui lòng điền đầy đủ thông tin")),
       );
@@ -42,18 +46,11 @@ class SignUpPageState extends State<SignUpPage> {
     }
 
     try {
-      final userCredential = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
+      setState(() => _isLoading = true);
 
-      await _db.collection('users').doc(userCredential.user!.uid).set({
-        'uid': userCredential.user!.uid,
-        'email': email,
-        'role': 'user',
-        'provider': 'email',
-        'createdAt': FieldValue.serverTimestamp(),
-      });
+      await _authService.signUpWithEmail(email, password, name);
+
+      if (!mounted) return;
 
       ScaffoldMessenger.of(
         context,
@@ -64,9 +61,9 @@ class SignUpPageState extends State<SignUpPage> {
         MaterialPageRoute(builder: (context) => const SignInPage()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text("Lỗi đăng ký: $e")));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("$e")));
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -85,6 +82,17 @@ class SignUpPageState extends State<SignUpPage> {
               const SizedBox(height: 30),
 
               TextField(
+                controller: nameController,
+                decoration: const InputDecoration(
+                  labelText: "Tên hiển thị",
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              TextField(
                 controller: emailController,
                 decoration: const InputDecoration(
                   labelText: "Email",
@@ -99,7 +107,7 @@ class SignUpPageState extends State<SignUpPage> {
                 controller: passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
-                  labelText: "Mật Khẩu",
+                  labelText: "Mật khẩu",
                   border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
@@ -109,11 +117,8 @@ class SignUpPageState extends State<SignUpPage> {
                           ? Icons.visibility_off
                           : Icons.visibility,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
+                    onPressed: () =>
+                        setState(() => _obscurePassword = !_obscurePassword),
                   ),
                 ),
               ),
@@ -123,7 +128,7 @@ class SignUpPageState extends State<SignUpPage> {
                 controller: confirmPasswordController,
                 obscureText: _obscureConfirmPassword,
                 decoration: InputDecoration(
-                  labelText: "Xác Nhận Mật Khẩu",
+                  labelText: "Xác nhận mật khẩu",
                   border: const OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                   ),
@@ -133,26 +138,27 @@ class SignUpPageState extends State<SignUpPage> {
                           ? Icons.visibility_off
                           : Icons.visibility,
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _obscureConfirmPassword = !_obscureConfirmPassword;
-                      });
-                    },
+                    onPressed: () => setState(
+                      () => _obscureConfirmPassword = !_obscureConfirmPassword,
+                    ),
                   ),
                 ),
               ),
               const SizedBox(height: 30),
 
               ElevatedButton(
-                onPressed: signUp,
+                onPressed: _isLoading ? null : signUp,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue,
                   minimumSize: const Size(double.infinity, 50),
                 ),
-                child: const Text("Đăng Ký"),
+                child: _isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text("Đăng Ký"),
               ),
 
               const SizedBox(height: 30),
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
