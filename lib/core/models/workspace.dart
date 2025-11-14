@@ -15,3 +15,24 @@ class Workspace {
     required this.members,
     required this.createdAt,
   }) : id = id ?? DateTime.now().microsecondsSinceEpoch.toString();
+  factory Workspace.fromJson(Map<String, dynamic> json) {
+    return Workspace(
+      id: json['id'],
+      name: json['name'],
+      ownerId: json['ownerId'],
+      members: (json['members'] as List)
+          .map((m) => UserModel.fromJson(Map<String, dynamic>.from(m)))
+          .toList(),
+      createdAt: DateTime.parse(json['createdAt']),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'ownerId': ownerId,
+      'members': members.map((m) => m.toMap()).toList(),
+      'createdAt': createdAt.toIso8601String(),
+    };
+  }
