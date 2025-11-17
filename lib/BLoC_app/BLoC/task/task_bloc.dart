@@ -42,27 +42,21 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     });
 
     on<ToggleTask>((event, emit) async {
-      final updated = state.tasks.map((t) {
-        if (t.id == event.task.id) {
-          return t.copyWith(
-            status: t.status == TaskStatus.ongoing
-                ? TaskStatus.completed
-                : TaskStatus.ongoing,
-          );
-        }
-        return t;
-      }).toList();
-
-      emit(state.copyWith(tasks: updated));
-
-      for (var t in updated) {
-        if (t.id == event.task.id) {
-          await LocalStorage.saveTask(t);
-          try {
-            await CloudStorage.updateTask(t, event.uid);
-          } catch (_) {}
-          break;
-        }
+      if (state is TaskLoaded) {
+        final current = state as TaskLoaded;
+        final toggled = event.task.copyWith(
+          status: event.task.status == TaskStatus.ongoing
+              ? TaskStatus.completed
+              : TaskStatus.ongoing,
+        );
+        await CloudStorage.updateTask(toggled, event.uid);
+        await LocalStorage.saveTask(toggled);
+        final updated = current.personalTasks
+            .map((t) => t.id == toggled.id ? toggled : t)
+            .toList();
+        emit(current.copyWith(personalTasks: updated));
+      }
+    });
     on<LoadWorkspaceTasks>((event, emit) async {
       emit(TaskLoading());
       try {
