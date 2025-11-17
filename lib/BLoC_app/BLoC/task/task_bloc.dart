@@ -104,6 +104,11 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
               ? TaskStatus.completed
               : TaskStatus.ongoing,
         );
+        await CloudStorage.updateWorkspaceTask(event.workspaceId, toggled);
+        final updated = current.workspaceTasks
+            .map((t) => t.id == toggled.id ? toggled : t)
+            .toList();
+        emit(current.copyWith(workspaceTasks: updated));
       }
     });
   }
