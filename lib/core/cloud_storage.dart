@@ -20,7 +20,7 @@ class CloudStorage {
         .doc(uid)
         .collection('notes')
         .doc(note.id)
-        .update(note.toJson());
+        .set(note.toJson(), SetOptions(merge: true));
   }
 
   static Future<void> deleteNote(String id, String uid) async {
@@ -52,7 +52,7 @@ class CloudStorage {
         .doc(uid)
         .collection('tasks')
         .doc(task.id)
-        .update(task.toJson());
+        .set(task.toJson(), SetOptions(merge: true));
   }
 
   static Future<void> deleteTask(String id, String uid) async {
