@@ -21,16 +21,14 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
     });
 
     on<AddTask>((event, emit) async {
-      final task = event.task.copyWith(uid: event.uid);
-      final updated = [...state.tasks, task];
-      emit(state.copyWith(tasks: updated));
-
-      await LocalStorage.saveTask(task);
-      try {
-        await CloudStorage.addTask(task, event.uid);
-      } catch (_) {}
+      if (state is TaskLoaded) {
+        final current = state as TaskLoaded;
+        await CloudStorage.addTask(event.task, event.uid);
+        await LocalStorage.saveTask(event.task);
+        final updated = List<Task>.from(current.personalTasks)..add(event.task);
+        emit(current.copyWith(personalTasks: updated));
+      }
     });
-
     on<DeleteTask>((event, emit) async {
       final updated = state.tasks.where((t) => t.id != event.id).toList();
       emit(state.copyWith(tasks: updated));
