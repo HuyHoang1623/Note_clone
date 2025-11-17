@@ -6,20 +6,17 @@ import 'package:note_clone/core/local_storage.dart';
 import 'package:note_clone/core/cloud_storage.dart';
 
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
-  TaskBloc() : super(const TaskState()) {
+  TaskBloc() : super(TaskInitial()) {
     on<LoadTasks>((event, emit) async {
-      List<Task> tasks = [];
+      emit(TaskLoading());
       try {
-        tasks = await CloudStorage.getTasks(event.uid);
-        for (var t in tasks) {
-          await LocalStorage.saveTask(t);
-        }
+        final tasks = await CloudStorage.getTasks(event.uid);
+        for (var t in tasks) await LocalStorage.saveTask(t);
+        emit(TaskLoaded(personalTasks: tasks));
       } catch (e) {
-        tasks = await LocalStorage.loadTasks();
+        emit(TaskError("Không tải được task cá nhân"));
       }
-      emit(state.copyWith(tasks: tasks));
     });
-
     on<AddTask>((event, emit) async {
       if (state is TaskLoaded) {
         final current = state as TaskLoaded;
@@ -40,7 +37,6 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         emit(current.copyWith(personalTasks: updated));
       }
     });
-
     on<ToggleTask>((event, emit) async {
       if (state is TaskLoaded) {
         final current = state as TaskLoaded;
@@ -94,11 +90,9 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         emit(current.copyWith(workspaceTasks: updated));
       }
     });
-
     on<ToggleWorkspaceTask>((event, emit) async {
       if (state is TaskLoaded) {
         final current = state as TaskLoaded;
-
         final toggled = event.task.copyWith(
           status: event.task.status == TaskStatus.ongoing
               ? TaskStatus.completed
