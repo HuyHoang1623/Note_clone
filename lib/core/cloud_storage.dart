@@ -75,11 +75,14 @@ class CloudStorage {
     }
   }
 
+  static Future<String?> getUidByEmail(String email) async {
     final snapshot = await db
         .collection('users')
-        .doc(uid)
-        .collection('tasks')
+        .where('email', isEqualTo: email)
+        .limit(1)
         .get();
-    return snapshot.docs.map((doc) => Task.fromJson(doc.data())).toList();
+
+    if (snapshot.docs.isEmpty) return null;
+    return snapshot.docs.first.data()['uid'];
   }
 }
