@@ -28,13 +28,16 @@ class CloudStorage {
   }
 
   static Future<List<Note>> getNotes(String uid) async {
-    final snapshot = await db
-        .collection('users')
-        .doc(uid)
-        .collection('notes')
-        .get();
-
-    return snapshot.docs.map((doc) => Note.fromJson(doc.data())).toList();
+    try {
+      final snapshot = await db
+          .collection('users')
+          .doc(uid)
+          .collection('notes')
+          .get();
+      return snapshot.docs.map((doc) => Note.fromJson(doc.data())).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   static Future<void> addTask(Task task, String uid) async {
