@@ -52,6 +52,19 @@ class _ToDoListPageState extends State<ToDoListPage>
       FocusScope.of(context).unfocus();
     }
   }
+
+  void addWorkspaceTask() {
+    final title = taskController.text.trim();
+    final user = FirebaseAuth.instance.currentUser;
+    if (title.isNotEmpty && user != null && selectedWorkspaceId != null) {
+      final task = Task(uid: user.uid, title: title, createdAt: DateTime.now());
+      context.read<TaskBloc>().add(
+        AddWorkspaceTask(selectedWorkspaceId!, task),
+      );
+      taskController.clear();
+      FocusScope.of(context).unfocus();
+    }
+  }
                     decoration: const InputDecoration(
                       hintText: "Nhập việc cần làm...",
                       border: OutlineInputBorder(),
