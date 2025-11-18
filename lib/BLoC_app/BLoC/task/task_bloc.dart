@@ -6,63 +6,53 @@ import 'package:note_clone/core/local_storage.dart';
 import 'package:note_clone/core/cloud_storage.dart';
 
 class TaskBloc extends Bloc<TaskEvent, TaskState> {
-  TaskBloc() : super(const TaskState()) {
+  TaskBloc() : super(TaskInitial()) {
     on<LoadTasks>((event, emit) async {
-      List<Task> tasks = [];
+      emit(TaskLoading());
       try {
-        tasks = await CloudStorage.getTasks(event.uid);
-        for (var t in tasks) {
-          await LocalStorage.saveTask(t);
-        }
+        final tasks = await CloudStorage.getTasks(event.uid);
+        for (var t in tasks) await LocalStorage.saveTask(t);
+        emit(TaskLoaded(personalTasks: tasks));
       } catch (e) {
-        tasks = await LocalStorage.loadTasks();
+        emit(TaskError("Không tải được task cá nhân"));
       }
-      emit(state.copyWith(tasks: tasks));
     });
-
     on<AddTask>((event, emit) async {
-      final task = event.task.copyWith(uid: event.uid);
-      final updated = [...state.tasks, task];
-      emit(state.copyWith(tasks: updated));
-
-      await LocalStorage.saveTask(task);
-      try {
-        await CloudStorage.addTask(task, event.uid);
-      } catch (_) {}
+      if (state is TaskLoaded) {
+        final current = state as TaskLoaded;
+        await CloudStorage.addTask(event.task, event.uid);
+        await LocalStorage.saveTask(event.task);
+        final updated = List<Task>.from(current.personalTasks)..add(event.task);
+        emit(current.copyWith(personalTasks: updated));
+      }
     });
-
     on<DeleteTask>((event, emit) async {
-      final updated = state.tasks.where((t) => t.id != event.id).toList();
-      emit(state.copyWith(tasks: updated));
-
-      await LocalStorage.deleteTask(event.id);
-      try {
+      if (state is TaskLoaded) {
+        final current = state as TaskLoaded;
         await CloudStorage.deleteTask(event.id, event.uid);
-      } catch (_) {}
+        await LocalStorage.deleteTask(event.id);
+        final updated = current.personalTasks
+            .where((t) => t.id != event.id)
+            .toList();
+        emit(current.copyWith(personalTasks: updated));
+      }
     });
-
     on<ToggleTask>((event, emit) async {
-      final updated = state.tasks.map((t) {
-        if (t.id == event.task.id) {
-          return t.copyWith(
-            status: t.status == TaskStatus.ongoing
-                ? TaskStatus.completed
-                : TaskStatus.ongoing,
-          );
-        }
-        return t;
-      }).toList();
-
-      emit(state.copyWith(tasks: updated));
-
-      for (var t in updated) {
-        if (t.id == event.task.id) {
-          await LocalStorage.saveTask(t);
-          try {
-            await CloudStorage.updateTask(t, event.uid);
-          } catch (_) {}
-          break;
-        }
+      if (state is TaskLoaded) {
+        final current = state as TaskLoaded;
+        final toggled = event.task.copyWith(
+          status: event.task.status == TaskStatus.ongoing
+              ? TaskStatus.completed
+              : TaskStatus.ongoing,
+        );
+        await CloudStorage.updateTask(toggled, event.uid);
+        await LocalStorage.saveTask(toggled);
+        final updated = current.personalTasks
+            .map((t) => t.id == toggled.id ? toggled : t)
+            .toList();
+        emit(current.copyWith(personalTasks: updated));
+      }
+    });
     on<LoadWorkspaceTasks>((event, emit) async {
       emit(TaskLoading());
       try {
@@ -100,16 +90,19 @@ class TaskBloc extends Bloc<TaskEvent, TaskState> {
         emit(current.copyWith(workspaceTasks: updated));
       }
     });
-
     on<ToggleWorkspaceTask>((event, emit) async {
       if (state is TaskLoaded) {
         final current = state as TaskLoaded;
-
         final toggled = event.task.copyWith(
           status: event.task.status == TaskStatus.ongoing
               ? TaskStatus.completed
               : TaskStatus.ongoing,
         );
+        await CloudStorage.updateWorkspaceTask(event.workspaceId, toggled);
+        final updated = current.workspaceTasks
+            .map((t) => t.id == toggled.id ? toggled : t)
+            .toList();
+        emit(current.copyWith(workspaceTasks: updated));
       }
     });
   }

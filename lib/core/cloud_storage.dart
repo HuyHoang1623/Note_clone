@@ -5,6 +5,33 @@ import 'package:note_clone/core/models/task.dart';
 class CloudStorage {
   static final FirebaseFirestore db = FirebaseFirestore.instance;
 
+  static Future<void> createWorkspace(String ownerUid, String name) async {
+    final docRef = db.collection('workspaces').doc();
+    await docRef.set({
+      'id': docRef.id,
+      'name': name,
+      'ownerUid': ownerUid,
+      'members': [ownerUid],
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
+
+  static Future<List<Map<String, dynamic>>> getUserWorkspaces(
+    String uid,
+  ) async {
+    final snapshot = await db
+        .collection('workspaces')
+        .where('members', arrayContains: uid)
+        .get();
+    return snapshot.docs.map((d) => d.data()).toList();
+  }
+
+  static Future<void> addMember(String workspaceId, String newMemberUid) async {
+    await db.collection('workspaces').doc(workspaceId).update({
+      'members': FieldValue.arrayUnion([newMemberUid]),
+    });
+  }
+
   static Future<void> addNote(Note note, String uid) async {
     await db
         .collection('users')
@@ -20,7 +47,7 @@ class CloudStorage {
         .doc(uid)
         .collection('notes')
         .doc(note.id)
-        .update(note.toJson());
+        .set(note.toJson(), SetOptions(merge: true));
   }
 
   static Future<void> deleteNote(String id, String uid) async {
@@ -28,13 +55,16 @@ class CloudStorage {
   }
 
   static Future<List<Note>> getNotes(String uid) async {
-    final snapshot = await db
-        .collection('users')
-        .doc(uid)
-        .collection('notes')
-        .get();
-
-    return snapshot.docs.map((doc) => Note.fromJson(doc.data())).toList();
+    try {
+      final snapshot = await db
+          .collection('users')
+          .doc(uid)
+          .collection('notes')
+          .get();
+      return snapshot.docs.map((doc) => Note.fromJson(doc.data())).toList();
+    } catch (_) {
+      return [];
+    }
   }
 
   static Future<void> addTask(Task task, String uid) async {
@@ -52,7 +82,7 @@ class CloudStorage {
         .doc(uid)
         .collection('tasks')
         .doc(task.id)
-        .update(task.toJson());
+        .set(task.toJson(), SetOptions(merge: true));
   }
 
   static Future<void> deleteTask(String id, String uid) async {
@@ -60,11 +90,66 @@ class CloudStorage {
   }
 
   static Future<List<Task>> getTasks(String uid) async {
+    try {
+      final snapshot = await db
+          .collection('users')
+          .doc(uid)
+          .collection('tasks')
+          .get();
+      return snapshot.docs.map((doc) => Task.fromJson(doc.data())).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<void> addWorkspaceTask(String workspaceId, Task task) async {
+    await db
+        .collection('workspaces')
+        .doc(workspaceId)
+        .collection('tasks')
+        .doc(task.id)
+        .set(task.toJson());
+  }
+
+  static Future<void> updateWorkspaceTask(String workspaceId, Task task) async {
+    await db
+        .collection('workspaces')
+        .doc(workspaceId)
+        .collection('tasks')
+        .doc(task.id)
+        .set(task.toJson(), SetOptions(merge: true));
+  }
+
+  static Future<void> deleteWorkspaceTask(String workspaceId, String id) async {
+    await db
+        .collection('workspaces')
+        .doc(workspaceId)
+        .collection('tasks')
+        .doc(id)
+        .delete();
+  }
+
+  static Future<List<Task>> getWorkspaceTasks(String workspaceId) async {
+    try {
+      final snapshot = await db
+          .collection('workspaces')
+          .doc(workspaceId)
+          .collection('tasks')
+          .get();
+      return snapshot.docs.map((doc) => Task.fromJson(doc.data())).toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  static Future<String?> getUidByEmail(String email) async {
     final snapshot = await db
         .collection('users')
-        .doc(uid)
-        .collection('tasks')
+        .where('email', isEqualTo: email)
+        .limit(1)
         .get();
-    return snapshot.docs.map((doc) => Task.fromJson(doc.data())).toList();
+
+    if (snapshot.docs.isEmpty) return null;
+    return snapshot.docs.first.data()['uid'];
   }
 }
