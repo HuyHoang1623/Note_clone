@@ -271,7 +271,6 @@ class _ToDoListPageState extends State<ToDoListPage>
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text("Không tìm thấy email nào")),
                   );
-                },
                   return;
                 }
 
@@ -294,7 +293,25 @@ class _ToDoListPageState extends State<ToDoListPage>
       },
     );
   }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text("Việc cần làm"),
+        bottom: TabBar(
+          controller: _tabController,
+          tabs: const [
+            Tab(text: "Cá nhân"),
+            Tab(text: "Workspace"),
+          ],
         ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: [_buildPersonalTaskTab(theme), _buildWorkspaceTaskTab(theme)],
       ),
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
