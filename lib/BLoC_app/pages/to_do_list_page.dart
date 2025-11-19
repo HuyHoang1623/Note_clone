@@ -320,4 +320,60 @@ class _ToDoListPageState extends State<ToDoListPage>
       ),
     );
   }
+
+  Widget _buildPersonalTaskTab(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: taskController,
+                  decoration: const InputDecoration(
+                    hintText: "Nhập việc cần làm...",
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: addPersonalTask,
+                child: const Text("Thêm"),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: BlocBuilder<TaskBloc, TaskState>(
+              builder: (context, state) {
+                if (state is TaskLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (state is! TaskLoaded || state.personalTasks.isEmpty) {
+                  return const Center(child: Text("Chưa có việc nào!"));
+                }
+
+                final ongoing = state.personalTasks
+                    .where((t) => t.status == TaskStatus.ongoing)
+                    .toList();
+                final completed = state.personalTasks
+                    .where((t) => t.status == TaskStatus.completed)
+                    .toList();
+
+                return _buildTaskList(
+                  context,
+                  theme,
+                  ongoing,
+                  completed,
+                  false,
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
