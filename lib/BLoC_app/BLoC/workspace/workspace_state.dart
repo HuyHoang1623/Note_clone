@@ -32,3 +32,14 @@ class WorkspaceMembersLoaded extends WorkspaceState {
   @override
   List<Object?> get props => [members];
 }
+
+class WorkspaceCreated extends WorkspaceState {}
+
+class WorkspaceError extends WorkspaceState {
+  final String message;
+
+  WorkspaceError(this.message);
+
+  @override
+  List<Object?> get props => [message];
+}
