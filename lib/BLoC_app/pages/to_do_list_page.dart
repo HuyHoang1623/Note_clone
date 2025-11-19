@@ -231,11 +231,69 @@ class _ToDoListPageState extends State<ToDoListPage>
       },
     );
   }
+
+  void _showAddMemberDialog(String workspaceId) {
+    final emailsController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Thêm thành viên"),
+          content: TextField(
+            controller: emailsController,
+            decoration: const InputDecoration(
+              labelText: "Email (phân cách bằng dấu ,)",
+              border: OutlineInputBorder(),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Hủy"),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final emailsText = emailsController.text.trim();
+                if (emailsText.isEmpty) return;
+
+                final emails = emailsText
+                    .split(',')
+                    .map((e) => e.trim())
+                    .toList();
+
+                final snapshot = await CloudStorage.db
+                    .collection('users')
+                    .where('email', whereIn: emails)
+                    .get();
+
+                if (snapshot.docs.isEmpty) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text("Không tìm thấy email nào")),
                   );
                 },
-              ),
+                  return;
+                }
+
+                final memberIds = snapshot.docs.map((doc) => doc.id).toList();
+
+                await CloudStorage.db
+                    .collection('workspaces')
+                    .doc(workspaceId)
+                    .update({'members': FieldValue.arrayUnion(memberIds)});
+
+                Navigator.pop(context);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Thêm thành viên thành công!")),
+                );
+              },
+              child: const Text("Thêm"),
             ),
           ],
+        );
+      },
+    );
+  }
         ),
       ),
       bottomNavigationBar: BottomAppBar(
