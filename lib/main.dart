@@ -7,7 +7,7 @@ import 'package:note_clone/BLoC_app/BLoC/task/task_event.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
-import 'package:note_clone/core/signin_signup/signin_page.dart';
+import 'package:note_clone/core/signin_signup/auth_gate.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +21,9 @@ void main() async {
         BlocProvider(
           create: (_) => NoteBloc()..add(LoadNotes(user?.uid ?? '')),
         ),
-        BlocProvider(create: (_) => TaskBloc()..add(LoadTasks())),
+        BlocProvider(
+          create: (_) => TaskBloc()..add(LoadTasks(user?.uid ?? '')),
+        ),
       ],
       child: const MyApp(),
     ),
@@ -52,7 +54,7 @@ class MyApp extends StatelessWidget {
           bodyMedium: TextStyle(color: Colors.white),
         ),
       ),
-      home: const SignInPage(),
+      home: const AuthGate(),
     );
   }
 }
