@@ -186,6 +186,51 @@ class _ToDoListPageState extends State<ToDoListPage>
       },
     );
   }
+
+  void _showWorkspaceMembers(String workspaceId) async {
+    final snapshot = await CloudStorage.db
+        .collection('workspaces')
+        .doc(workspaceId)
+        .get();
+    final data = snapshot.data();
+    if (data == null) return;
+
+    final members = List<String>.from(data['members']);
+    final usersSnapshot = await CloudStorage.db
+        .collection('users')
+        .where(FieldPath.documentId, whereIn: members)
+        .get();
+
+    final userEmails = usersSnapshot.docs
+        .map((doc) => doc['email'] ?? 'Không rõ')
+        .toList();
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text("Thành viên Workspace"),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: userEmails
+                .map(
+                  (email) => ListTile(
+                    leading: const Icon(Icons.person),
+                    title: Text(email),
+                  ),
+                )
+                .toList(),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Đóng"),
+            ),
+          ],
+        );
+      },
+    );
+  }
                   );
                 },
               ),
