@@ -376,4 +376,115 @@ class _ToDoListPageState extends State<ToDoListPage>
       ),
     );
   }
+
+  Widget _buildWorkspaceTaskTab(ThemeData theme) {
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text("Workspace của bạn", style: TextStyle(fontSize: 16)),
+              TextButton.icon(
+                onPressed: () => _showCreateWorkspaceDialog(context),
+                icon: const Icon(Icons.add),
+                label: const Text("Tạo mới"),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          DropdownButton<String>(
+            value: selectedWorkspaceId,
+            hint: const Text("Chọn workspace"),
+            isExpanded: true,
+            items: workspaces.map((ws) {
+              return DropdownMenuItem<String>(
+                value: ws['id'],
+                child: Text(ws['name']),
+              );
+            }).toList(),
+            onChanged: (id) {
+              setState(() {
+                selectedWorkspaceId = id;
+                selectedWorkspaceName = workspaces
+                    .firstWhere((w) => w['id'] == id)['name']
+                    .toString();
+              });
+              if (id != null) {
+                context.read<TaskBloc>().add(LoadWorkspaceTasks(id));
+              }
+            },
+          ),
+          const SizedBox(height: 8),
+          if (selectedWorkspaceId != null)
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton.icon(
+                  icon: const Icon(Icons.people),
+                  label: const Text("Xem thành viên"),
+                  onPressed: () => _showWorkspaceMembers(selectedWorkspaceId!),
+                ),
+                TextButton.icon(
+                  icon: const Icon(Icons.person_add),
+                  label: const Text("Thêm thành viên"),
+                  onPressed: () => _showAddMemberDialog(selectedWorkspaceId!),
+                ),
+              ],
+            ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: TextField(
+                  controller: taskController,
+                  decoration: InputDecoration(
+                    hintText: selectedWorkspaceId == null
+                        ? "Chọn workspace trước..."
+                        : "Nhập việc trong workspace...",
+                    border: const OutlineInputBorder(),
+                  ),
+                  enabled: selectedWorkspaceId != null,
+                ),
+              ),
+              const SizedBox(width: 8),
+              ElevatedButton(
+                onPressed: selectedWorkspaceId != null
+                    ? addWorkspaceTask
+                    : null,
+                child: const Text("Thêm"),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Expanded(
+            child: BlocBuilder<TaskBloc, TaskState>(
+              builder: (context, state) {
+                if (state is TaskLoading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (state is! TaskLoaded ||
+                    state.workspaceId != selectedWorkspaceId ||
+                    state.workspaceTasks.isEmpty) {
+                  return const Center(
+                    child: Text("Chưa có việc nào trong workspace này!"),
+                  );
+                }
+
+                final ongoing = state.workspaceTasks
+                    .where((t) => t.status == TaskStatus.ongoing)
+                    .toList();
+                final completed = state.workspaceTasks
+                    .where((t) => t.status == TaskStatus.completed)
+                    .toList();
+
+                return _buildTaskList(context, theme, ongoing, completed, true);
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 }
