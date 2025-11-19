@@ -65,11 +65,43 @@ class _ToDoListPageState extends State<ToDoListPage>
       FocusScope.of(context).unfocus();
     }
   }
+
+  void _showCreateWorkspaceDialog(BuildContext context) {
+    final nameController = TextEditingController();
+    final emailsController = TextEditingController();
+    bool isLoading = false;
+
+    showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text("Tạo Workspace"),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    controller: nameController,
                     decoration: const InputDecoration(
-                      hintText: "Nhập việc cần làm...",
+                      labelText: "Tên workspace",
                       border: OutlineInputBorder(),
                     ),
                   ),
+                  const SizedBox(height: 10),
+                  TextField(
+                    controller: emailsController,
+                    decoration: const InputDecoration(
+                      labelText: "Email thành viên (phân cách bằng dấu ,)",
+                      border: OutlineInputBorder(),
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text("Hủy"),
                 ),
 
                               }
