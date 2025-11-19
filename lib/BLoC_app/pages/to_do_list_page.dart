@@ -103,10 +103,89 @@ class _ToDoListPageState extends State<ToDoListPage>
                   onPressed: () => Navigator.pop(context),
                   child: const Text("Hủy"),
                 ),
+                ElevatedButton(
+                  onPressed: isLoading
+                      ? null
+                      : () async {
+                          final name = nameController.text.trim();
+                          final emailsText = emailsController.text.trim();
+                          final owner = FirebaseAuth.instance.currentUser;
+                          if (name.isEmpty || owner == null) return;
 
+                          setState(() => isLoading = true);
+                          try {
+                            final docRef = CloudStorage.db
+                                .collection('workspaces')
+                                .doc();
+                            List<String> members = [owner.uid];
+
+                            if (emailsText.isNotEmpty) {
+                              final emails = emailsText
+                                  .split(',')
+                                  .map((e) => e.trim())
+                                  .toList();
+                              final snapshot = await CloudStorage.db
+                                  .collection('users')
+                                  .where('email', whereIn: emails)
+                                  .get();
+                              for (var doc in snapshot.docs) {
+                                members.add(doc.id);
                               }
+                              if (snapshot.docs.length != emails.length) {
+                                final foundEmails = snapshot.docs
+                                    .map((d) => d['email'] as String)
+                                    .toSet();
+                                final missing = emails
+                                    .where((e) => !foundEmails.contains(e))
+                                    .join(', ');
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Một số email không tồn tại: $missing",
+                                    ),
+                                  ),
                                 );
                               }
+                            }
+
+                            await docRef.set({
+                              'id': docRef.id,
+                              'name': name,
+                              'ownerUid': owner.uid,
+                              'members': members,
+                              'createdAt': DateTime.now(),
+                            });
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text("Tạo workspace thành công!"),
+                              ),
+                            );
+
+                            Navigator.pop(context);
+                            _loadWorkspaces(owner.uid);
+                          } catch (e) {
+                            ScaffoldMessenger.of(
+                              context,
+                            ).showSnackBar(SnackBar(content: Text("Lỗi: $e")));
+                          }
+                          setState(() => isLoading = false);
+                        },
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 16,
+                          height: 16,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text("Tạo"),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
                   );
                 },
               ),
