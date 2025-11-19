@@ -23,3 +23,12 @@ class WorkspaceLoaded extends WorkspaceState {
   @override
   List<Object?> get props => [workspaces, selectedId, selectedName];
 }
+
+class WorkspaceMembersLoaded extends WorkspaceState {
+  final List<String> members;
+
+  WorkspaceMembersLoaded(this.members);
+
+  @override
+  List<Object?> get props => [members];
+}
