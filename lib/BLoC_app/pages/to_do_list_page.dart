@@ -487,4 +487,96 @@ class _ToDoListPageState extends State<ToDoListPage>
       ),
     );
   }
+
+  Widget _buildTaskList(
+    BuildContext context,
+    ThemeData theme,
+    List<Task> ongoing,
+    List<Task> completed,
+    bool isWorkspace,
+  ) {
+    return ListView(
+      children: [
+        Text("Chưa hoàn thành", style: theme.textTheme.titleLarge),
+        ...ongoing.map(
+          (task) => ListTile(
+            leading: Checkbox(
+              value: false,
+              onChanged: (_) {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  if (isWorkspace && selectedWorkspaceId != null) {
+                    context.read<TaskBloc>().add(
+                      ToggleWorkspaceTask(selectedWorkspaceId!, task),
+                    );
+                  } else {
+                    context.read<TaskBloc>().add(ToggleTask(task, user.uid));
+                  }
+                }
+              },
+            ),
+            title: Text(task.title),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  if (isWorkspace && selectedWorkspaceId != null) {
+                    context.read<TaskBloc>().add(
+                      DeleteWorkspaceTask(selectedWorkspaceId!, task.id),
+                    );
+                  } else {
+                    context.read<TaskBloc>().add(DeleteTask(task.id, user.uid));
+                  }
+                }
+              },
+            ),
+          ),
+        ),
+        const Divider(height: 30, thickness: 1),
+        Text("Đã hoàn thành", style: theme.textTheme.titleLarge),
+        ...completed.map(
+          (task) => ListTile(
+            leading: Checkbox(
+              value: true,
+              onChanged: (_) {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  if (isWorkspace && selectedWorkspaceId != null) {
+                    context.read<TaskBloc>().add(
+                      ToggleWorkspaceTask(selectedWorkspaceId!, task),
+                    );
+                  } else {
+                    context.read<TaskBloc>().add(ToggleTask(task, user.uid));
+                  }
+                }
+              },
+            ),
+            title: Text(
+              task.title,
+              style: const TextStyle(
+                decoration: TextDecoration.lineThrough,
+                color: Colors.grey,
+              ),
+            ),
+            trailing: IconButton(
+              icon: const Icon(Icons.delete, color: Colors.red),
+              onPressed: () {
+                final user = FirebaseAuth.instance.currentUser;
+                if (user != null) {
+                  if (isWorkspace && selectedWorkspaceId != null) {
+                    context.read<TaskBloc>().add(
+                      DeleteWorkspaceTask(selectedWorkspaceId!, task.id),
+                    );
+                  } else {
+                    context.read<TaskBloc>().add(DeleteTask(task.id, user.uid));
+                  }
+                }
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
 }
