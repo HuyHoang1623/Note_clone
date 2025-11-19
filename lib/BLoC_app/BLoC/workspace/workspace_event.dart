@@ -31,3 +31,24 @@ class LoadWorkspaceMembers extends WorkspaceEvent {
 
   @override
   List<Object?> get props => [workspaceId];
+}
+
+class AddWorkspaceMembers extends WorkspaceEvent {
+  final String workspaceId;
+  final List<String> emails;
+
+  AddWorkspaceMembers(this.workspaceId, this.emails);
+
+  @override
+  List<Object?> get props => [workspaceId, emails];
+}
+
+class SelectWorkspace extends WorkspaceEvent {
+  final String workspaceId;
+  final String workspaceName;
+
+  SelectWorkspace(this.workspaceId, this.workspaceName);
+
+  @override
+  List<Object?> get props => [workspaceId, workspaceName];
+}
