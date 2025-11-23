@@ -23,3 +23,30 @@ class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
         emit(WorkspaceError(e.toString()));
       }
     });
+
+    on<CreateWorkspace>((event, emit) async {
+      emit(WorkspaceLoading());
+      try {
+        await CloudStorage.createWorkspace(event.ownerUid, event.name);
+
+        if (event.emails.isNotEmpty) {
+          final snapshot = await CloudStorage.db
+              .collection('workspaces')
+              .where('ownerUid', isEqualTo: event.ownerUid)
+              .orderBy('createdAt', descending: true)
+              .limit(1)
+              .get();
+
+          final newWorkspaceId = snapshot.docs.first.id;
+
+          await CloudStorage.addMembersToWorkspace(
+            newWorkspaceId,
+            event.emails,
+          );
+        }
+
+        emit(WorkspaceCreated());
+      } catch (e) {
+        emit(WorkspaceError(e.toString()));
+      }
+    });
