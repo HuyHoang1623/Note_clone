@@ -23,6 +23,7 @@ class CloudStorage {
         .collection('workspaces')
         .where('members', arrayContains: uid)
         .get();
+
     return snapshot.docs.map((d) => d.data()).toList();
   }
 
@@ -54,6 +55,13 @@ class CloudStorage {
     if (snapshot.docs.isEmpty) return null;
     return snapshot.docs.first.data()['uid'];
   }
+
+  static Future<List<String>> getWorkspaceMembers(String workspaceId) async {
+    final doc = await db.collection('workspaces').doc(workspaceId).get();
+    if (!doc.exists) return [];
+    return List<String>.from(doc['members'] ?? []);
+  }
+
   static Future<void> addNote(Note note, String uid) async {
     await db
         .collection('users')
