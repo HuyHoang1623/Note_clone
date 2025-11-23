@@ -23,6 +23,7 @@ class CloudStorage {
         .collection('workspaces')
         .where('members', arrayContains: uid)
         .get();
+
     return snapshot.docs.map((d) => d.data()).toList();
   }
 
@@ -30,6 +31,35 @@ class CloudStorage {
     await db.collection('workspaces').doc(workspaceId).update({
       'members': FieldValue.arrayUnion([newMemberUid]),
     });
+  }
+
+  static Future<void> addMembersToWorkspace(
+    String workspaceId,
+    List<String> emails,
+  ) async {
+    for (final email in emails) {
+      final uid = await getUidByEmail(email);
+      if (uid != null) {
+        await addMember(workspaceId, uid);
+      }
+    }
+  }
+
+  static Future<String?> getUidByEmail(String email) async {
+    final snapshot = await db
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isEmpty) return null;
+    return snapshot.docs.first.data()['uid'];
+  }
+
+  static Future<List<String>> getWorkspaceMembers(String workspaceId) async {
+    final doc = await db.collection('workspaces').doc(workspaceId).get();
+    if (!doc.exists) return [];
+    return List<String>.from(doc['members'] ?? []);
   }
 
   static Future<void> addNote(Note note, String uid) async {
@@ -140,16 +170,5 @@ class CloudStorage {
     } catch (_) {
       return [];
     }
-  }
-
-  static Future<String?> getUidByEmail(String email) async {
-    final snapshot = await db
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .limit(1)
-        .get();
-
-    if (snapshot.docs.isEmpty) return null;
-    return snapshot.docs.first.data()['uid'];
   }
 }
