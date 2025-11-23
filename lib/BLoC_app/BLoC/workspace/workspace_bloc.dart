@@ -50,3 +50,18 @@ class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
         emit(WorkspaceError(e.toString()));
       }
     });
+    on<SelectWorkspace>((event, emit) {
+      if (state is WorkspaceLoaded) {
+        final current = state as WorkspaceLoaded;
+
+        emit(
+          WorkspaceLoaded(
+            workspaces: current.workspaces,
+            selectedId: event.workspaceId,
+            selectedName: event.workspaceName,
+          ),
+        );
+      }
+    });
+  }
+}
