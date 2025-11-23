@@ -50,6 +50,19 @@ class WorkspaceBloc extends Bloc<WorkspaceEvent, WorkspaceState> {
         emit(WorkspaceError(e.toString()));
       }
     });
+
+    on<LoadWorkspaceMembers>((event, emit) async {
+      emit(WorkspaceLoading());
+      try {
+        final members = await CloudStorage.getWorkspaceMembers(
+          event.workspaceId,
+        );
+
+        emit(WorkspaceMembersLoaded(members));
+      } catch (e) {
+        emit(WorkspaceError(e.toString()));
+      }
+    });
     on<SelectWorkspace>((event, emit) {
       if (state is WorkspaceLoaded) {
         final current = state as WorkspaceLoaded;
