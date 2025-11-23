@@ -32,6 +32,28 @@ class CloudStorage {
     });
   }
 
+  static Future<void> addMembersToWorkspace(
+    String workspaceId,
+    List<String> emails,
+  ) async {
+    for (final email in emails) {
+      final uid = await getUidByEmail(email);
+      if (uid != null) {
+        await addMember(workspaceId, uid);
+      }
+    }
+  }
+
+  static Future<String?> getUidByEmail(String email) async {
+    final snapshot = await db
+        .collection('users')
+        .where('email', isEqualTo: email)
+        .limit(1)
+        .get();
+
+    if (snapshot.docs.isEmpty) return null;
+    return snapshot.docs.first.data()['uid'];
+  }
   static Future<void> addNote(Note note, String uid) async {
     await db
         .collection('users')
@@ -140,16 +162,5 @@ class CloudStorage {
     } catch (_) {
       return [];
     }
-  }
-
-  static Future<String?> getUidByEmail(String email) async {
-    final snapshot = await db
-        .collection('users')
-        .where('email', isEqualTo: email)
-        .limit(1)
-        .get();
-
-    if (snapshot.docs.isEmpty) return null;
-    return snapshot.docs.first.data()['uid'];
   }
 }
