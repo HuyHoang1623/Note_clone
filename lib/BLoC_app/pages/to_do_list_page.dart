@@ -8,6 +8,7 @@ import 'package:note_clone/BLoC_app/BLoC/task/task_state.dart';
 import 'package:note_clone/core/models/task.dart';
 import 'package:note_clone/core/cloud_storage.dart';
 import 'package:note_clone/BLoC_app/pages/home_page.dart';
+import 'package:note_clone/BLoC_app/pages/cat_api_page.dart';
 
 class ToDoListPage extends StatefulWidget {
   const ToDoListPage({super.key});
@@ -317,7 +318,7 @@ class _ToDoListPageState extends State<ToDoListPage>
         shape: const CircularNotchedRectangle(),
         notchMargin: 6.0,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
               icon: const Icon(Icons.home, size: 28),
@@ -331,6 +332,13 @@ class _ToDoListPageState extends State<ToDoListPage>
             IconButton(
               icon: const Icon(Icons.checklist, size: 28),
               onPressed: () {},
+            ),
+            IconButton(
+              icon: const Icon(Icons.pets, size: 28),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CatApiPage()),
+              ),
             ),
           ],
         ),

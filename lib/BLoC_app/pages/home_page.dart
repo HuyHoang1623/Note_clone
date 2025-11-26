@@ -9,6 +9,7 @@ import 'package:note_clone/core/local_storage.dart';
 import 'package:note_clone/BLoC_app/pages/add_note_page.dart';
 import 'package:note_clone/BLoC_app/pages/to_do_list_page.dart';
 import 'package:note_clone/core/signin_signup/signin_page.dart';
+import 'package:note_clone/BLoC_app/pages/cat_api_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -168,6 +169,7 @@ class _HomePageState extends State<HomePage> {
           IconButton(icon: const Icon(Icons.logout), onPressed: _signOut),
         ],
       ),
+
       body: Column(
         children: [
           Padding(
@@ -204,25 +206,36 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+
       floatingActionButton: FloatingActionButton(
         onPressed: () => _openAddNote(context),
         child: const Icon(Icons.add, size: 28),
       ),
+
       bottomNavigationBar: BottomAppBar(
         shape: const CircularNotchedRectangle(),
         notchMargin: 6.0,
         child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
               icon: const Icon(Icons.home, size: 28),
               onPressed: () {},
             ),
+
             IconButton(
               icon: const Icon(Icons.checklist, size: 28),
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const ToDoListPage()),
+              ),
+            ),
+
+            IconButton(
+              icon: const Icon(Icons.pets, size: 28),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const CatApiPage()),
               ),
             ),
           ],
