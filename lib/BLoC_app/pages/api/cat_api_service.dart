@@ -34,3 +34,17 @@ class CatService {
       throw Exception('Failed to fetch cats');
     }
   }
+
+  static Future<Cat> createCat(String name, String origin) async {
+    final response = await http.post(
+      Uri.parse(baseUrl),
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode({'name': name, 'origin': origin}),
+    );
+
+    if (response.statusCode == 201 || response.statusCode == 200) {
+      return Cat.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception('Failed to create cat');
+    }
+  }
