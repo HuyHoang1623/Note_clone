@@ -12,6 +12,12 @@ class CatPage extends StatefulWidget {
 
 class CatPageState extends State<CatPage> {
   late Future<List<Cat>> futureCats;
+
+  final TextEditingController nameController = TextEditingController();
+  final TextEditingController originController = TextEditingController();
+
+  bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -23,12 +29,72 @@ class CatPageState extends State<CatPage> {
       futureCats = CatService.fetchCats();
     });
   }
+
+  Future<void> createCat() async {
+    if (nameController.text.isEmpty || originController.text.isEmpty) return;
+    if (isLoading) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      await CatService.createCat(
+        nameController.text.trim(),
+        originController.text.trim(),
+      );
+
+      nameController.clear();
+      originController.clear();
+
+      refreshData();
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> deleteCatItem(String id) async {
+    await CatService.deleteCat(id);
+    refreshData();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text("Cat API")),
       body: Column(
         children: [
+          Padding(
+            padding: const EdgeInsets.all(12.0),
+            child: Column(
+              children: [
+                TextField(
+                  controller: nameController,
+                  decoration: const InputDecoration(labelText: "Name"),
+                ),
+                TextField(
+                  controller: originController,
+                  decoration: const InputDecoration(labelText: "Origin"),
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: isLoading ? null : createCat,
+                  child: isLoading
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            color: Colors.white,
+                          ),
+                        )
+                      : const Text("Add Cat"),
+                ),
+              ],
+            ),
+          ),
           const Divider(),
           Expanded(
             child: FutureBuilder<List<Cat>>(
