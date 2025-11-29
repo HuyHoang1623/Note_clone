@@ -48,3 +48,14 @@ class CatService {
       throw Exception('Failed to create cat');
     }
   }
+
+  static Future<void> deleteCat(String id) async {
+    final response = await http.delete(Uri.parse('$baseUrl/$id'));
+
+    if (response.statusCode == 200 || response.statusCode == 204) {
+      return;
+    } else {
+      throw Exception('Failed to delete cat');
+    }
+  }
+}
