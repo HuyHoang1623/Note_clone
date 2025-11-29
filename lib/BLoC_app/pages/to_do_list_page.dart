@@ -8,7 +8,7 @@ import 'package:note_clone/BLoC_app/BLoC/task/task_state.dart';
 import 'package:note_clone/core/models/task.dart';
 import 'package:note_clone/core/cloud_storage.dart';
 import 'package:note_clone/BLoC_app/pages/home_page.dart';
-import 'package:note_clone/BLoC_app/pages/cat_api_page.dart';
+import 'package:note_clone/BLoC_app/pages/api/cat_api_page.dart';
 
 class ToDoListPage extends StatefulWidget {
   const ToDoListPage({super.key});
@@ -337,7 +337,7 @@ class _ToDoListPageState extends State<ToDoListPage>
               icon: const Icon(Icons.pets, size: 28),
               onPressed: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const CatApiPage()),
+                MaterialPageRoute(builder: (_) => CatPage()),
               ),
             ),
           ],
