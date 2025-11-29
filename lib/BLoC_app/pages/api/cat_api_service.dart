@@ -20,3 +20,17 @@ class Cat {
     return {'name': name, 'origin': origin};
   }
 }
+
+class CatService {
+  static const String baseUrl =
+      'https://692955919d311cddf3491497.mockapi.io/api/v1/cat';
+
+  static Future<List<Cat>> fetchCats() async {
+    final response = await http.get(Uri.parse(baseUrl));
+    if (response.statusCode == 200) {
+      final List<dynamic> list = jsonDecode(response.body);
+      return list.map((e) => Cat.fromJson(e)).toList();
+    } else {
+      throw Exception('Failed to fetch cats');
+    }
+  }
