@@ -16,6 +16,17 @@ class CatApiService {
     return data.map((e) => Cat.fromJson(e)).toList();
   }
 
+  Future<Cat?> uploadImage(File file) async {
+    final uri = Uri.parse('$_baseUrl/upload');
+    final req = http.MultipartRequest('POST', uri);
+    req.headers['x-api-key'] = _apiKey;
+
+    req.files.add(
+      await http.MultipartFile.fromPath(
+        'file',
+        file.path,
+        contentType: MediaType('image', 'jpeg'),
+      ),
     );
   }
 
@@ -35,19 +46,12 @@ class CatService {
       throw Exception('Failed to fetch cats');
     }
   }
+    if (response.statusCode != 201) return null;
 
-  static Future<Cat> createCat(String name, String origin) async {
-    final response = await http.post(
-      Uri.parse(baseUrl),
-      headers: {'Content-Type': 'application/json; charset=UTF-8'},
-      body: jsonEncode({'name': name, 'origin': origin}),
-    );
+    final data = json.decode(resp);
+    if (data['id'] == null || data['url'] == null) return null;
 
-    if (response.statusCode == 201 || response.statusCode == 200) {
-      return Cat.fromJson(jsonDecode(response.body));
-    } else {
-      throw Exception('Failed to create cat');
-    }
+    return Cat.fromJson(data);
   }
 
   static Future<void> deleteCat(String id) async {
