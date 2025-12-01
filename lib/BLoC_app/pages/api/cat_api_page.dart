@@ -30,28 +30,23 @@ class CatPageState extends State<CatPage> {
     });
   }
 
-  Future<void> createCat() async {
-    if (nameController.text.isEmpty || originController.text.isEmpty) return;
-    if (isLoading) return;
+  Future<void> pickAndUpload() async {
+    final file = await ImagePicker().pickImage(source: ImageSource.gallery);
+    if (file == null) return;
 
-    setState(() {
-      isLoading = true;
-    });
+    setState(() => isLoading = true);
 
-    try {
-      await CatService.createCat(
-        nameController.text.trim(),
-        originController.text.trim(),
+    final uploaded = await _service.uploadImage(File(file.path));
+
+    if (uploaded == null) {
+      setState(() => isLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Đây không phải ảnh mèo, vui lòng chọn ảnh khác"),
+          backgroundColor: Colors.red,
+        ),
       );
-
-      nameController.clear();
-      originController.clear();
-
-      refreshData();
-    } finally {
-      setState(() {
-        isLoading = false;
-      });
+      return;
     }
   }
 
