@@ -1,25 +1,26 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:http_parser/http_parser.dart';
+import 'cat_model.dart';
 
-class Cat {
-  final String id;
-  final String name;
-  final String origin;
+class CatApiService {
+  static const String _apiKey =
+      'live_5s0Apt2FK2G0Z61ZgmWYA5zYHppniCnLq4zcwKwZPvASQYztP6EyZ5efNFj2ZL0t';
+  static const String _baseUrl = 'https://api.thecatapi.com/v1/images';
 
-  Cat({required this.id, required this.name, required this.origin});
+  Future<List<Cat>> fetchImages() async {
+    final url = Uri.parse('$_baseUrl?limit=30');
+    final res = await http.get(url, headers: {'x-api-key': _apiKey});
+    final List data = json.decode(res.body);
+    return data.map((e) => Cat.fromJson(e)).toList();
+  }
 
-  factory Cat.fromJson(Map<String, dynamic> json) {
-    return Cat(
-      id: json['id']?.toString() ?? '',
-      name: json['name']?.toString() ?? '',
-      origin: json['origin']?.toString() ?? '',
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {'name': name, 'origin': origin};
-  }
-}
+    final response = await req.send();
+    final resp = await response.stream.bytesToString();
 
 class CatService {
   static const String baseUrl =
