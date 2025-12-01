@@ -1,7 +1,9 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+
+import 'cat_model.dart';
 import 'cat_api_service.dart';
-import 'package:note_clone/BLoC_app/pages/to_do_list_page.dart';
-import 'package:note_clone/BLoC_app/pages/home_page.dart';
 
 class CatPage extends StatefulWidget {
   const CatPage({super.key});
@@ -11,23 +13,19 @@ class CatPage extends StatefulWidget {
 }
 
 class CatPageState extends State<CatPage> {
-  late Future<List<Cat>> futureCats;
-
-  final TextEditingController nameController = TextEditingController();
-  final TextEditingController originController = TextEditingController();
-
+  final CatApiService _service = CatApiService();
+  List<Cat> images = [];
   bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    futureCats = CatService.fetchCats();
+    loadImages();
   }
 
-  void refreshData() {
-    setState(() {
-      futureCats = CatService.fetchCats();
-    });
+  Future<void> loadImages() async {
+    final data = await _service.fetchImages();
+    setState(() => images = data);
   }
 
   Future<void> pickAndUpload() async {
