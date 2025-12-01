@@ -46,11 +46,15 @@ class CatPageState extends State<CatPage> {
       );
       return;
     }
+
+    images.insert(0, uploaded);
+    setState(() => isLoading = false);
   }
 
-  Future<void> deleteCatItem(String id) async {
-    await CatService.deleteCat(id);
-    refreshData();
+  Future<void> deleteImage(Cat cat) async {
+    await _service.deleteImage(cat.id);
+    images.remove(cat);
+    setState(() {});
   }
 
   @override
