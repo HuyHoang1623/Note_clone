@@ -28,24 +28,10 @@ class CatApiService {
         contentType: MediaType('image', 'jpeg'),
       ),
     );
-  }
 
     final response = await req.send();
     final resp = await response.stream.bytesToString();
 
-class CatService {
-  static const String baseUrl =
-      'https://692955919d311cddf3491497.mockapi.io/api/v1/cat';
-
-  static Future<List<Cat>> fetchCats() async {
-    final response = await http.get(Uri.parse(baseUrl));
-    if (response.statusCode == 200) {
-      final List<dynamic> list = jsonDecode(response.body);
-      return list.map((e) => Cat.fromJson(e)).toList();
-    } else {
-      throw Exception('Failed to fetch cats');
-    }
-  }
     if (response.statusCode != 201) return null;
 
     final data = json.decode(resp);
@@ -54,13 +40,8 @@ class CatService {
     return Cat.fromJson(data);
   }
 
-  static Future<void> deleteCat(String id) async {
-    final response = await http.delete(Uri.parse('$baseUrl/$id'));
-
-    if (response.statusCode == 200 || response.statusCode == 204) {
-      return;
-    } else {
-      throw Exception('Failed to delete cat');
-    }
+  Future<void> deleteImage(String id) async {
+    final url = Uri.parse('$_baseUrl/$id');
+    await http.delete(url, headers: {'x-api-key': _apiKey});
   }
 }
