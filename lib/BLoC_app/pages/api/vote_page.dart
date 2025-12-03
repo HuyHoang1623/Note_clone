@@ -50,35 +50,27 @@ class _VotePageState extends State<VotePage> {
         .length;
   }
 
-  Future<void> toggleLike(String imageId) async {
+  Future<void> toggleVote(String imageId, int value) async {
     final vote = getVote(imageId);
 
     if (vote == null) {
-      await _service.voteImage(imageId, 1);
-    } else if (vote["value"] == 1) {
-      await _service.deleteVote(vote["id"]);
+      final newVoteId = await _service.voteImage(imageId, value);
+      if (newVoteId != null) {
+        votes.add({"id": newVoteId, "image_id": imageId, "value": value});
+      }
+    } else if (vote["value"] == value) {
+      final success = await _service.deleteVote(vote["id"]);
+      if (success) votes.removeWhere((v) => v["id"] == vote["id"]);
     } else {
-      await _service.deleteVote(vote["id"]);
-      await _service.voteImage(imageId, 1);
+      final success = await _service.deleteVote(vote["id"]);
+      if (success) votes.removeWhere((v) => v["id"] == vote["id"]);
+
+      final newVoteId = await _service.voteImage(imageId, value);
+      if (newVoteId != null) {
+        votes.add({"id": newVoteId, "image_id": imageId, "value": value});
+      }
     }
 
-    votes = await _service.getAllVotes();
-    setState(() {});
-  }
-
-  Future<void> toggleDislike(String imageId) async {
-    final vote = getVote(imageId);
-
-    if (vote == null) {
-      await _service.voteImage(imageId, 0);
-    } else if (vote["value"] == 0) {
-      await _service.deleteVote(vote["id"]);
-    } else {
-      await _service.deleteVote(vote["id"]);
-      await _service.voteImage(imageId, 0);
-    }
-
-    votes = await _service.getAllVotes();
     setState(() {});
   }
 
@@ -114,7 +106,7 @@ class _VotePageState extends State<VotePage> {
                                   Icons.thumb_up,
                                   color: value == 1 ? Colors.blue : Colors.grey,
                                 ),
-                                onPressed: () => toggleLike(imageId),
+                                onPressed: () => toggleVote(imageId, 1),
                               ),
                               Text("$likeCount"),
                             ],
@@ -127,7 +119,7 @@ class _VotePageState extends State<VotePage> {
                                   Icons.thumb_down,
                                   color: value == 0 ? Colors.red : Colors.grey,
                                 ),
-                                onPressed: () => toggleDislike(imageId),
+                                onPressed: () => toggleVote(imageId, 0),
                               ),
                               Text("$dislikeCount"),
                             ],
