@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'cat_model.dart';
 import 'cat_api_service.dart';
+import 'vote_page.dart';
 
 class CatPage extends StatefulWidget {
   const CatPage({super.key});
@@ -60,7 +61,20 @@ class CatPageState extends State<CatPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Cat Images")),
+      appBar: AppBar(
+        title: const Text("Cat Images"),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.how_to_vote),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const VotePage()),
+              );
+            },
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: isLoading ? null : pickAndUpload,
         child: isLoading
