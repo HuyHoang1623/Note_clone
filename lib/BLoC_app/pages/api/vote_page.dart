@@ -24,3 +24,47 @@
     }
   }
 
+  int countLikes(String imageId) {
+    return votes
+        .where((v) => v["image_id"] == imageId && v["value"] == 1)
+        .length;
+  }
+
+  int countDislikes(String imageId) {
+    return votes
+        .where((v) => v["image_id"] == imageId && v["value"] == 0)
+        .length;
+  }
+
+  Future<void> toggleLike(String imageId) async {
+    final vote = getVote(imageId);
+
+    if (vote == null) {
+      await _service.voteImage(imageId, 1);
+    } else if (vote["value"] == 1) {
+      await _service.deleteVote(vote["id"]);
+    } else {
+      await _service.deleteVote(vote["id"]);
+      await _service.voteImage(imageId, 1);
+    }
+
+    votes = await _service.getAllVotes();
+    setState(() {});
+  }
+
+  Future<void> toggleDislike(String imageId) async {
+    final vote = getVote(imageId);
+
+    if (vote == null) {
+      await _service.voteImage(imageId, 0);
+    } else if (vote["value"] == 0) {
+      await _service.deleteVote(vote["id"]);
+    } else {
+      await _service.deleteVote(vote["id"]);
+      await _service.voteImage(imageId, 0);
+    }
+
+    votes = await _service.getAllVotes();
+    setState(() {});
+  }
+
