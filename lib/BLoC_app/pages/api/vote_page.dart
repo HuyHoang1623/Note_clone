@@ -15,6 +15,8 @@ class _VotePageState extends State<VotePage> {
   List<Cat> images = [];
   List<Map<String, dynamic>> votes = [];
 
+  Map<String, bool> votingLock = {};
+
   bool isLoading = true;
 
   @override
@@ -33,7 +35,7 @@ class _VotePageState extends State<VotePage> {
   Map<String, dynamic>? getVote(String imageId) {
     try {
       return votes.firstWhere((v) => v["image_id"] == imageId);
-    } catch (e) {
+    } catch (_) {
       return null;
     }
   }
@@ -51,6 +53,10 @@ class _VotePageState extends State<VotePage> {
   }
 
   Future<void> toggleVote(String imageId, int value) async {
+    if (votingLock[imageId] == true) return;
+
+    votingLock[imageId] = true;
+
     final vote = getVote(imageId);
 
     if (vote == null) {
@@ -70,6 +76,8 @@ class _VotePageState extends State<VotePage> {
         votes.add({"id": newVoteId, "image_id": imageId, "value": value});
       }
     }
+
+    votingLock[imageId] = false;
 
     setState(() {});
   }
