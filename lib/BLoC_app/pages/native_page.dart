@@ -14,6 +14,26 @@ class _BatteryDemoPageState extends State<BatteryDemoPage> {
 
   String result = "No data yet";
 
+  Future<void> getAndroidBattery() async {
+    if (!Platform.isAndroid) {
+      setState(() => result = "Không phải Android!");
+      return;
+    }
+
+    final battery = await _channel.invokeMethod('getAndroidBattery');
+    setState(() => result = "Android Battery: $battery%");
+  }
+
+  Future<void> getIosBattery() async {
+    if (!Platform.isIOS) {
+      setState(() => result = "Không phải iOS!");
+      return;
+    }
+
+    final battery = await _channel.invokeMethod('getIosBattery');
+    setState(() => result = "iOS Battery: $battery%");
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
