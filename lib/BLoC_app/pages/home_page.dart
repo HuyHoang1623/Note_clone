@@ -10,6 +10,7 @@ import 'package:note_clone/BLoC_app/pages/add_note_page.dart';
 import 'package:note_clone/BLoC_app/pages/to_do_list_page.dart';
 import 'package:note_clone/core/signin_signup/signin_page.dart';
 import 'package:note_clone/BLoC_app/pages/api/cat_api_page.dart';
+import 'package:note_clone/BLoC_app/pages/native_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -236,6 +237,13 @@ class _HomePageState extends State<HomePage> {
               onPressed: () => Navigator.push(
                 context,
                 MaterialPageRoute(builder: (_) => const CatPage()),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.battery_full, size: 28),
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const BatteryDemoPage()),
               ),
             ),
           ],
