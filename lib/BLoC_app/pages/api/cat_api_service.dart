@@ -13,11 +13,18 @@ class CatApiService {
 
   static const String userId = "user_001";
 
-  Future<List<Cat>> fetchImages() async {
-    final url = Uri.parse('$_baseUrl?limit=30');
+  Future<List<Cat>> fetchCatsPaginated({int page = 0, int limit = 10}) async {
+    final url = Uri.parse(
+      '$_baseUrl/search?limit=$limit&page=$page&order=Desc',
+    );
     final response = await http.get(url, headers: {'x-api-key': _apiKey});
-    final List data = json.decode(response.body);
-    return data.map((e) => Cat.fromJson(e)).toList();
+
+    if (response.statusCode != 200) {
+      throw Exception('Failed to load cats');
+    }
+
+    final List<dynamic> data = json.decode(response.body);
+    return data.map((json) => Cat.fromJson(json)).toList();
   }
 
   Future<Cat?> uploadImage(File file) async {
