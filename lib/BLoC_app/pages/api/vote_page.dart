@@ -27,7 +27,7 @@ class _VotePageState extends State<VotePage> {
 
   Future<void> loadAll() async {
     setState(() => isLoading = true);
-    images = await _service.fetchImages();
+    images = await _service.fetchCatsPaginated();
     votes = await _service.getAllVotes();
     setState(() => isLoading = false);
   }
