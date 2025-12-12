@@ -15,18 +15,71 @@ class CatPage extends StatefulWidget {
 
 class CatPageState extends State<CatPage> {
   final CatApiService _service = CatApiService();
+  final ScrollController _scrollController = ScrollController();
+
   List<Cat> images = [];
   bool isLoading = false;
+  bool isLoadMore = false;
+
+  int page = 0;
+  final int limit = 20;
+  bool hasMore = true;
+
+  bool _lock = false;
 
   @override
   void initState() {
     super.initState();
     loadImages();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent - 200 &&
+          !_lock &&
+          hasMore) {
+        loadMore();
+      }
+    });
   }
 
   Future<void> loadImages() async {
-    final data = await _service.fetchImages();
-    setState(() => images = data);
+    page = 0;
+    hasMore = true;
+    images.clear();
+
+    setState(() => isLoading = true);
+    final data = await _service.fetchCatsPaginated(page: page, limit: limit);
+
+    setState(() {
+      images = data;
+      isLoading = false;
+      if (data.isEmpty) hasMore = false;
+    });
+  }
+
+  Future<void> loadMore() async {
+    if (_lock) return;
+    _lock = true;
+    isLoadMore = true;
+    setState(() {});
+
+    page++;
+
+    final data = await _service.fetchCatsPaginated(page: page, limit: limit);
+
+    if (data.isEmpty) {
+      hasMore = false;
+    } else {
+      final uniqueData = data.where(
+        (cat) => !images.any((c) => c.id == cat.id),
+      );
+
+      images.addAll(uniqueData);
+    }
+
+    isLoadMore = false;
+    _lock = false;
+    setState(() {});
   }
 
   Future<void> pickAndUpload() async {
