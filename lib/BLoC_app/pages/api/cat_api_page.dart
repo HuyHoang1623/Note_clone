@@ -88,20 +88,23 @@ class CatPageState extends State<CatPage> {
 
     setState(() => isLoading = true);
 
-    final uploaded = await _service.uploadImage(File(file.path));
+    try {
+      final uploaded = await _service.uploadImage(File(file.path));
 
-    if (uploaded == null) {
-      setState(() => isLoading = false);
+      if (uploaded == null) {
+        throw Exception("API rejected image");
+      }
+
+      images.insert(0, uploaded);
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Đây không phải ảnh mèo, vui lòng chọn ảnh khác"),
+        SnackBar(
+          content: Text("Không thể tải ảnh lên: ${e.toString()}"),
           backgroundColor: Colors.red,
         ),
       );
-      return;
     }
 
-    images.insert(0, uploaded);
     setState(() => isLoading = false);
   }
 
@@ -134,11 +137,19 @@ class CatPageState extends State<CatPage> {
             ? const CircularProgressIndicator(color: Colors.white)
             : const Icon(Icons.add),
       ),
-      body: images.isEmpty
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-              itemCount: images.length,
+              controller: _scrollController,
+              itemCount: images.length + (isLoadMore ? 1 : 0),
               itemBuilder: (_, index) {
+                if (index == images.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
                 final cat = images[index];
                 return Card(
                   margin: const EdgeInsets.all(8),
