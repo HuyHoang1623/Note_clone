@@ -15,18 +15,71 @@ class CatPage extends StatefulWidget {
 
 class CatPageState extends State<CatPage> {
   final CatApiService _service = CatApiService();
+  final ScrollController _scrollController = ScrollController();
+
   List<Cat> images = [];
   bool isLoading = false;
+  bool isLoadMore = false;
+
+  int page = 0;
+  final int limit = 20;
+  bool hasMore = true;
+
+  bool _lock = false;
 
   @override
   void initState() {
     super.initState();
     loadImages();
+
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+              _scrollController.position.maxScrollExtent - 200 &&
+          !_lock &&
+          hasMore) {
+        loadMore();
+      }
+    });
   }
 
   Future<void> loadImages() async {
-    final data = await _service.fetchImages();
-    setState(() => images = data);
+    page = 0;
+    hasMore = true;
+    images.clear();
+
+    setState(() => isLoading = true);
+    final data = await _service.fetchCatsPaginated(page: page, limit: limit);
+
+    setState(() {
+      images = data;
+      isLoading = false;
+      if (data.isEmpty) hasMore = false;
+    });
+  }
+
+  Future<void> loadMore() async {
+    if (_lock) return;
+    _lock = true;
+    isLoadMore = true;
+    setState(() {});
+
+    page++;
+
+    final data = await _service.fetchCatsPaginated(page: page, limit: limit);
+
+    if (data.isEmpty) {
+      hasMore = false;
+    } else {
+      final uniqueData = data.where(
+        (cat) => !images.any((c) => c.id == cat.id),
+      );
+
+      images.addAll(uniqueData);
+    }
+
+    isLoadMore = false;
+    _lock = false;
+    setState(() {});
   }
 
   Future<void> pickAndUpload() async {
@@ -35,20 +88,23 @@ class CatPageState extends State<CatPage> {
 
     setState(() => isLoading = true);
 
-    final uploaded = await _service.uploadImage(File(file.path));
+    try {
+      final uploaded = await _service.uploadImage(File(file.path));
 
-    if (uploaded == null) {
-      setState(() => isLoading = false);
+      if (uploaded == null) {
+        throw Exception("API rejected image");
+      }
+
+      images.insert(0, uploaded);
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Đây không phải ảnh mèo, vui lòng chọn ảnh khác"),
+        SnackBar(
+          content: Text("Không thể tải ảnh lên: ${e.toString()}"),
           backgroundColor: Colors.red,
         ),
       );
-      return;
     }
 
-    images.insert(0, uploaded);
     setState(() => isLoading = false);
   }
 
@@ -81,11 +137,19 @@ class CatPageState extends State<CatPage> {
             ? const CircularProgressIndicator(color: Colors.white)
             : const Icon(Icons.add),
       ),
-      body: images.isEmpty
+      body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView.builder(
-              itemCount: images.length,
+              controller: _scrollController,
+              itemCount: images.length + (isLoadMore ? 1 : 0),
               itemBuilder: (_, index) {
+                if (index == images.length) {
+                  return const Padding(
+                    padding: EdgeInsets.all(16),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+
                 final cat = images[index];
                 return Card(
                   margin: const EdgeInsets.all(8),
