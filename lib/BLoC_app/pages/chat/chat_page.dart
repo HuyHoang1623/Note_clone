@@ -49,6 +49,36 @@ class _ChatPageState extends State<ChatPage> {
       ),
     );
   }
+
+  Widget _buildMessageList() {
+    return StreamBuilder<QuerySnapshot>(
+      stream: _chatService.getMessages(
+        widget.currentUser.uid,
+        widget.receiverUser.uid,
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (!snapshot.hasData) {
+          return const Center(child: Text('Hãy bắt đầu cuộc trò chuyện.'));
+        }
+
+        final messages = snapshot.data!.docs
+            .map((doc) => MessageModel.fromDocument(doc))
+            .toList();
+
+        return ListView.builder(
+          reverse: true,
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          itemCount: messages.length,
+          itemBuilder: (context, index) {
+            return _buildMessageItem(messages[index]);
+          },
+        );
+      },
+    );
+  }
   Widget _buildMessageInput() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
