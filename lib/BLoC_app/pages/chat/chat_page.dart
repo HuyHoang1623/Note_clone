@@ -15,6 +15,17 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+  final TextEditingController _messageController = TextEditingController();
+  void _sendMessage() {
+    if (_messageController.text.isNotEmpty) {
+      _chatService.sendMessage(
+        widget.currentUser,
+        widget.receiverUser.uid,
+        _messageController.text.trim(),
+      );
+      _messageController.clear();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,3 +35,46 @@ class _ChatPageState extends State<ChatPage> {
         backgroundColor: Colors.blue.shade700,
         foregroundColor: Colors.white,
       ),
+      body: Column(
+        children: [
+          Expanded(child: _buildMessageList()),
+          _buildMessageInput(),
+        ],
+      ),
+    );
+  }
+  Widget _buildMessageInput() {
+    return Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Row(
+        children: [
+          Expanded(
+            child: TextField(
+              controller: _messageController,
+              decoration: InputDecoration(
+                hintText: 'Nhập tin nhắn...',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(25.0),
+                  borderSide: BorderSide.none,
+                ),
+                filled: true,
+                fillColor: Colors.grey.shade200,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.blue.shade600,
+              shape: BoxShape.circle,
+            ),
+            child: IconButton(
+              icon: const Icon(Icons.send, color: Colors.white),
+              onPressed: _sendMessage,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
