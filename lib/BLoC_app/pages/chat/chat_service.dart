@@ -34,3 +34,12 @@ class ChatService {
         .doc(chatRoomId)
         .collection('messages')
         .add(messageData);
+
+    await _firestore.collection('chat_rooms').doc(chatRoomId).set({
+      'users': [senderUser.uid, receiverId],
+      'lastMessage': message,
+      'timestamp': FieldValue.serverTimestamp(),
+      'lastMessageSenderId': senderUser.uid,
+    }, SetOptions(merge: true));
+  }
+
