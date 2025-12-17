@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:note_clone/core/models/user.dart';
+import 'package:note_clone/core/models/message.dart';
+import 'chat_service.dart';
+
 class ChatPage extends StatefulWidget {
   final UserModel receiverUser;
   final UserModel currentUser;
@@ -16,6 +20,8 @@ class ChatPage extends StatefulWidget {
 
 class _ChatPageState extends State<ChatPage> {
   final TextEditingController _messageController = TextEditingController();
+  final ChatService _chatService = ChatService();
+
   void _sendMessage() {
     if (_messageController.text.isNotEmpty) {
       _chatService.sendMessage(
