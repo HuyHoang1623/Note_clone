@@ -11,3 +11,26 @@ class ChatService {
     ids.sort();
     return ids.join('_');
   }
+
+  Future<void> sendMessage(
+    UserModel senderUser,
+    String receiverId,
+    String message,
+  ) async {
+    if (message.trim().isEmpty) return;
+
+    final chatRoomId = getChatRoomId(senderUser.uid, receiverId);
+
+    Map<String, dynamic> messageData = {
+      'sender_id': senderUser.uid,
+      'sender_name': senderUser.name,
+      'sender_photoUrl': senderUser.photoUrl,
+      'text': message,
+      'timestamp': FieldValue.serverTimestamp(),
+    };
+
+    await _firestore
+        .collection('chat_rooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .add(messageData);
