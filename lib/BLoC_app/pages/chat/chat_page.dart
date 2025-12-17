@@ -79,6 +79,30 @@ class _ChatPageState extends State<ChatPage> {
       },
     );
   }
+
+  Widget _buildMessageItem(MessageModel message) {
+    final isMe = message.senderID == widget.currentUser.uid;
+
+    return Align(
+      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        margin: EdgeInsets.fromLTRB(isMe ? 50 : 8, 4, isMe ? 8 : 50, 4),
+        decoration: BoxDecoration(
+          color: isMe ? Colors.blue.shade600 : Colors.grey.shade300,
+          borderRadius: BorderRadius.circular(15),
+        ),
+        child: Text(
+          message.text,
+          style: TextStyle(
+            color: isMe ? Colors.white : Colors.black,
+            fontSize: 16,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildMessageInput() {
     return Padding(
       padding: const EdgeInsets.all(8.0),
