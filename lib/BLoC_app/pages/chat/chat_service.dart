@@ -43,3 +43,14 @@ class ChatService {
     }, SetOptions(merge: true));
   }
 
+  Stream<QuerySnapshot> getMessages(String userId1, String userId2) {
+    final chatRoomId = getChatRoomId(userId1, userId2);
+
+    return _firestore
+        .collection('chat_rooms')
+        .doc(chatRoomId)
+        .collection('messages')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
+  }
+}
