@@ -17,12 +17,13 @@ class MessageModel {
 
   factory MessageModel.fromDocument(DocumentSnapshot doc) {
     final data = doc.data() as Map<String, dynamic>;
+
     return MessageModel(
-      senderID: data['senderID'] ?? '',
+      senderID: data['sender_id'] ?? '',
       text: data['text'] ?? '',
       timestamp: data['timestamp'] ?? Timestamp.now(),
-      senderName: data['senderName'],
-      senderPhotoUrl: data['senderPhotoUrl'],
+      senderName: data['sender_name'],
+      senderPhotoUrl: data['sender_photoUrl'],
     );
   }
 }
