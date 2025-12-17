@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:note_clone/BLoC_app/BLoC/note/note_bloc.dart';
-import 'package:note_clone/BLoC_app/BLoC/task/task_bloc.dart';
-import 'package:note_clone/BLoC_app/BLoC/note/note_event.dart';
-import 'package:note_clone/BLoC_app/BLoC/task/task_event.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
 import 'firebase_options.dart';
-import 'package:note_clone/core/signin_signup/auth_gate.dart';
+import 'package:note_clone/BLoC_app/router/app_router.dart';
+
+import 'package:note_clone/BLoC_app/BLoC/note/note_bloc.dart';
+import 'package:note_clone/BLoC_app/BLoC/note/note_event.dart';
+import 'package:note_clone/BLoC_app/BLoC/task/task_bloc.dart';
+import 'package:note_clone/BLoC_app/BLoC/task/task_event.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -35,8 +37,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
+      title: 'Note Clone',
+      routerConfig: router,
       theme: ThemeData(
         brightness: Brightness.dark,
         scaffoldBackgroundColor: const Color(0xFF0B0B0B),
@@ -54,7 +58,6 @@ class MyApp extends StatelessWidget {
           bodyMedium: TextStyle(color: Colors.white),
         ),
       ),
-      home: const AuthGate(),
     );
   }
 }
